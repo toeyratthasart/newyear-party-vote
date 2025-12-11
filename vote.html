@@ -3,170 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Year Party Vote</title>
+    <title>ระบบให้คะแนนประกวดชุดปีใหม่ 2025</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body class="bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 min-h-screen p-4">
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-6xl mx-auto">
         <!-- Header -->
         <div class="bg-white rounded-2xl shadow-2xl p-6 mb-6 text-center">
             <h1 class="text-4xl font-bold text-blue-600 mb-2">
-                🎉 Varinda's VOTE AWARDS
+                🎭 ประกวดชุดปีใหม่ 2025 🎭
             </h1>
-            <p class="text-gray-600">เลือกผู้ชนะในแต่ละหัวข้อ</p>
-            <div class="mt-4 inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-semibold">
-                📝 หน้าสำหรับผู้โหวต
+            <p class="text-gray-600 mb-2">ให้คะแนนทั้ง 9 คน ใน 4 หัวข้อ (1-5 คะแนน)</p>
+            <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-3 mt-4">
+                <p class="font-semibold text-blue-800 mb-2">เกณฑ์การให้คะแนน:</p>
+                <div class="grid grid-cols-5 gap-2 text-sm text-center">
+                    <div class="bg-red-100 rounded p-2">⭐ 1 = น้อยที่สุด</div>
+                    <div class="bg-orange-100 rounded p-2">⭐⭐ 2 = น้อย</div>
+                    <div class="bg-yellow-100 rounded p-2">⭐⭐⭐ 3 = ปานกลาง</div>
+                    <div class="bg-lime-100 rounded p-2">⭐⭐⭐⭐ 4 = ดี</div>
+                    <div class="bg-green-100 rounded p-2">⭐⭐⭐⭐⭐ 5 = ดีเยี่ยม</div>
+                </div>
             </div>
         </div>
 
         <!-- Voting Form -->
-        <div id="votingForm" class="bg-white rounded-2xl shadow-2xl p-8">
+        <div id="votingForm" class="bg-white rounded-2xl shadow-2xl p-6">
             <!-- Name Input -->
-            <div class="mb-8">
+            <div class="mb-6 pb-6 border-b-2 border-gray-200">
                 <label class="block text-lg font-semibold text-gray-700 mb-2">
-                    ชื่อของคุณ *
+                    ชื่อผู้ให้คะแนน *
                 </label>
                 <input
                     type="text"
                     id="voterName"
-                    placeholder="กรอกชื่อตัวเองได้เลยจ้า"
+                    placeholder="กรอกชื่อของคุณ"
                     class="w-full px-4 py-3 border-2 border-blue-300 rounded-lg focus:outline-none focus:border-blue-500 text-lg"
                 />
             </div>
 
-            <!-- Categories -->
-            <div id="categoriesContainer"></div>
+            <!-- Progress -->
+            <div class="mb-6 bg-gray-100 rounded-lg p-4">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-semibold text-gray-700">ความคืบหน้า:</span>
+                    <span id="progressText" class="text-blue-600 font-bold">0/36 คะแนน</span>
+                </div>
+                <div class="w-full bg-gray-300 rounded-full h-3">
+                    <div id="progressBar" class="bg-blue-600 h-3 rounded-full transition-all" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Scoring Grid -->
+            <div id="scoringGrid"></div>
 
             <!-- Submit Button -->
             <button
                 id="submitBtn"
-                class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-xl transition-all shadow-lg transform hover:scale-105 hover:from-blue-700 hover:to-blue-800 flex items-center justify-center gap-2"
+                class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-xl transition-all shadow-lg transform hover:scale-105 hover:from-blue-700 hover:to-blue-800 mt-6"
             >
-                <span>📤</span>
-                ส่งคะแนนโหวต
+                📤 ส่งคะแนน
             </button>
         </div>
 
-        <!-- Success Message (Hidden Initially) -->
+        <!-- Success Message -->
         <div id="successMessage" class="hidden bg-white rounded-2xl shadow-2xl p-8">
             <div class="text-center py-12">
                 <div class="text-6xl mb-4">✅</div>
                 <h2 class="text-3xl font-bold text-green-600 mb-2">
-                    ขอบคุณสำหรับการโหวต!
+                    ขอบคุณสำหรับการให้คะแนน!
                 </h2>
                 <p class="text-gray-600 mb-2">คะแนนของคุณถูกบันทึกเรียบร้อยแล้ว</p>
                 <p id="voterNameDisplay" class="text-sm text-gray-500 mb-8"></p>
                 
-                <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 mb-6">
-                    <h3 class="font-bold text-blue-800 mb-3">สรุปคะแนนของคุณ:</h3>
-                    <div id="voteSummary" class="text-left space-y-2"></div>
-                </div>
-
                 <button
                     id="voteAgainBtn"
                     class="px-8 py-3 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 transition-all"
                 >
-                    โหวตอีกครั้ง
+                    ให้คะแนนอีกครั้ง
                 </button>
             </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="text-center mt-6 text-white">
-            <p class="text-sm opacity-80">
-                💡 สำหรับผู้ดูแลระบบ: เปิด dashboard เพื่อดูผลโหวตเรียลไทม์
-            </p>
         </div>
     </div>
 
     <script>
-        // ⚠️ ใส่ Firebase Config ของคุณที่นี่
-const firebaseConfig = {
-  apiKey: "AIzaSyBxQI-sxUkZshLoAq9sZQ5zKm-7NXyytfQ",
-  authDomain: "newyear-party-vote.firebaseapp.com",
-  databaseURL: "https://newyear-party-vote-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "newyear-party-vote",
-  storageBucket: "newyear-party-vote.firebasestorage.app",
-  messagingSenderId: "537539574238",
-  appId: "1:537539574238:web:b7ed2507d1bcfc3203854f"
-};
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBxQI-sxUkZshLoAq9sZQ5zKm-7NXyytfQ",
+            authDomain: "newyear-party-vote.firebaseapp.com",
+            databaseURL: "https://newyear-party-vote-default-rtdb.asia-southeast1.firebaseio.com",
+            projectId: "newyear-party-vote",
+            storageBucket: "newyear-party-vote.firebasestorage.app",
+            messagingSenderId: "537539574238",
+            appId: "1:537539574238:web:b7ed2507d1bcfc3203854f"
+        };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
         // Configuration
         const CATEGORIES = [
-            { id: 'cat1', name: 'แต่งกายสวยที่สุด' },
-            { id: 'cat2', name: 'เต้นเก่งที่สุด' },
-            { id: 'cat3', name: 'ร้องเพลงเพราะที่สุด' },
-            { id: 'cat4', name: 'บุคลิกดีที่สุด' }
+            { id: 'cat1', name: 'ความเหมือน/เครื่องแต่งกายเข้ากับธีมงาน' },
+            { id: 'cat2', name: 'ความคิดสร้างสรรค์' },
+            { id: 'cat3', name: 'แรงบันดาลใจ/ที่มาของชุด' },
+            { id: 'cat4', name: 'การนำเสนอชุด' }
         ];
 
         const CONTESTANTS = [
-            { id: 'team-a', name: 'ทีม A', color: '#3B82F6' },
-            { id: 'team-b', name: 'ทีม B', color: '#10B981' },
-            { id: 'team-c', name: 'ทีม C', color: '#F59E0B' },
-            { id: 'team-d', name: 'ทีม D', color: '#EF4444' }
+            { id: 'p1', name: 'แมน', dept: 'DC' },
+            { id: 'p2', name: 'นิก', dept: 'DC' },
+            { id: 'p3', name: 'ดา', dept: 'Retail' },
+            { id: 'p4', name: 'บอส', dept: 'PD' },
+            { id: 'p5', name: 'เอื้อ', dept: 'PD' },
+            { id: 'p6', name: 'ไนซ์', dept: 'MKT' },
+            { id: 'p7', name: 'ตาล', dept: 'Import & Export' },
+            { id: 'p8', name: 'ไอซ์', dept: 'Import & Export' },
+            { id: 'p9', name: 'เฟิร์น', dept: 'HR' }
         ];
 
-        let votes = {};
+        const DEPT_COLORS = {
+            'DC': '#3B82F6',
+            'Retail': '#10B981',
+            'PD': '#F59E0B',
+            'MKT': '#EF4444',
+            'Import & Export': '#8B5CF6',
+            'HR': '#EC4899'
+        };
 
-        // Render Categories
-        function renderCategories() {
-            const container = document.getElementById('categoriesContainer');
-            container.innerHTML = CATEGORIES.map((category, idx) => `
-                <div class="mb-8 pb-8 border-b border-gray-200 last:border-b-0">
-                    <h3 class="text-2xl font-bold text-blue-700 mb-4">
-                        ${idx + 1}. ${category.name}
-                        <span id="check-${category.id}" class="ml-2 text-green-600 hidden">✓</span>
-                    </h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        ${CONTESTANTS.map(contestant => `
-                            <button
-                                data-category="${category.id}"
-                                data-contestant="${contestant.id}"
-                                class="contestant-btn p-6 rounded-xl border-3 border-gray-300 bg-white transition-all transform hover:scale-105 hover:border-blue-300"
-                            >
-                                <div class="text-center">
-                                    <div class="w-16 h-16 rounded-full mx-auto mb-3" style="background-color: ${contestant.color}"></div>
-                                    <p class="font-semibold text-gray-800">${contestant.name}</p>
-                                    <p class="check-mark text-blue-600 text-sm mt-2 hidden">✓ เลือกแล้ว</p>
+        let scores = {};
+
+        // Initialize scores
+        CONTESTANTS.forEach(contestant => {
+            scores[contestant.id] = {};
+            CATEGORIES.forEach(category => {
+                scores[contestant.id][category.id] = 0;
+            });
+        });
+
+        // Render Scoring Grid
+        function renderScoringGrid() {
+            const container = document.getElementById('scoringGrid');
+            
+            const html = CONTESTANTS.map((contestant, idx) => `
+                <div class="mb-8 pb-8 ${idx < CONTESTANTS.length - 1 ? 'border-b-2 border-gray-100' : ''}">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div 
+                            class="w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg"
+                            style="background-color: ${DEPT_COLORS[contestant.dept]}"
+                        >
+                            ${idx + 1}
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800">${contestant.name}</h3>
+                            <p class="text-sm text-gray-500 font-semibold">${contestant.dept}</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        ${CATEGORIES.map((category, catIdx) => `
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <p class="font-semibold text-gray-700 mb-3">${catIdx + 1}. ${category.name}</p>
+                                <div class="flex gap-2 justify-between">
+                                    ${[1, 2, 3, 4, 5].map(score => `
+                                        <button
+                                            data-contestant="${contestant.id}"
+                                            data-category="${category.id}"
+                                            data-score="${score}"
+                                            class="score-btn flex-1 py-3 px-2 rounded-lg border-2 transition-all text-center font-bold
+                                                ${score === 1 ? 'border-red-300 hover:bg-red-100 hover:border-red-500' : ''}
+                                                ${score === 2 ? 'border-orange-300 hover:bg-orange-100 hover:border-orange-500' : ''}
+                                                ${score === 3 ? 'border-yellow-300 hover:bg-yellow-100 hover:border-yellow-500' : ''}
+                                                ${score === 4 ? 'border-lime-300 hover:bg-lime-100 hover:border-lime-500' : ''}
+                                                ${score === 5 ? 'border-green-300 hover:bg-green-100 hover:border-green-500' : ''}
+                                            "
+                                        >
+                                            <div class="text-2xl mb-1">${score}</div>
+                                            <div class="text-xs text-gray-600">
+                                                ${'⭐'.repeat(score)}
+                                            </div>
+                                        </button>
+                                    `).join('')}
                                 </div>
-                            </button>
+                            </div>
                         `).join('')}
                     </div>
                 </div>
             `).join('');
 
+            container.innerHTML = html;
+
             // Add event listeners
-            document.querySelectorAll('.contestant-btn').forEach(btn => {
+            document.querySelectorAll('.score-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    const categoryId = this.dataset.category;
                     const contestantId = this.dataset.contestant;
-                    selectContestant(categoryId, contestantId);
+                    const categoryId = this.dataset.category;
+                    const score = parseInt(this.dataset.score);
+                    selectScore(contestantId, categoryId, score, this);
                 });
             });
         }
 
-        function selectContestant(categoryId, contestantId) {
-            votes[categoryId] = contestantId;
+        function selectScore(contestantId, categoryId, score, btnElement) {
+            scores[contestantId][categoryId] = score;
 
             // Update UI
-            document.querySelectorAll(`[data-category="${categoryId}"]`).forEach(btn => {
-                btn.classList.remove('border-blue-500', 'bg-blue-50', 'shadow-lg', 'scale-105');
-                btn.classList.add('border-gray-300', 'bg-white');
-                btn.querySelector('.check-mark').classList.add('hidden');
+            const buttons = document.querySelectorAll(`[data-contestant="${contestantId}"][data-category="${categoryId}"]`);
+            buttons.forEach(btn => {
+                btn.classList.remove('ring-4', 'ring-blue-500', 'bg-red-100', 'bg-orange-100', 'bg-yellow-100', 'bg-lime-100', 'bg-green-100', 'scale-110');
+                btn.classList.add('border-2');
             });
 
-            const selectedBtn = document.querySelector(`[data-category="${categoryId}"][data-contestant="${contestantId}"]`);
-            selectedBtn.classList.remove('border-gray-300', 'bg-white');
-            selectedBtn.classList.add('border-blue-500', 'bg-blue-50', 'shadow-lg', 'scale-105');
-            selectedBtn.querySelector('.check-mark').classList.remove('hidden');
+            const scoreValue = parseInt(btnElement.dataset.score);
+            btnElement.classList.add('ring-4', 'ring-blue-500', 'scale-110');
+            if (scoreValue === 1) btnElement.classList.add('bg-red-100');
+            if (scoreValue === 2) btnElement.classList.add('bg-orange-100');
+            if (scoreValue === 3) btnElement.classList.add('bg-yellow-100');
+            if (scoreValue === 4) btnElement.classList.add('bg-lime-100');
+            if (scoreValue === 5) btnElement.classList.add('bg-green-100');
 
-            document.getElementById(`check-${categoryId}`).classList.remove('hidden');
+            updateProgress();
+        }
+
+        function updateProgress() {
+            let completed = 0;
+            const total = CONTESTANTS.length * CATEGORIES.length;
+
+            CONTESTANTS.forEach(contestant => {
+                CATEGORIES.forEach(category => {
+                    if (scores[contestant.id][category.id] > 0) {
+                        completed++;
+                    }
+                });
+            });
+
+            const percentage = (completed / total) * 100;
+            document.getElementById('progressBar').style.width = percentage + '%';
+            document.getElementById('progressText').textContent = `${completed}/${total} คะแนน`;
         }
 
         // Submit Vote
@@ -174,13 +246,22 @@ const firebaseConfig = {
             const voterName = document.getElementById('voterName').value.trim();
 
             if (!voterName) {
-                alert('กรุณากรอกNew Year Party Vote');
+                alert('กรุณากรอกชื่อของคุณ');
                 return;
             }
 
-            const allCategoriesVoted = CATEGORIES.every(cat => votes[cat.id]);
-            if (!allCategoriesVoted) {
-                alert('กรุณาโหวตให้ครบทุกหัวข้อ');
+            // Check if all scores are given
+            let allScored = true;
+            CONTESTANTS.forEach(contestant => {
+                CATEGORIES.forEach(category => {
+                    if (scores[contestant.id][category.id] === 0) {
+                        allScored = false;
+                    }
+                });
+            });
+
+            if (!allScored) {
+                alert('กรุณาให้คะแนนให้ครบทุกคนทุกหัวข้อ');
                 return;
             }
 
@@ -190,49 +271,45 @@ const firebaseConfig = {
             try {
                 const voteData = {
                     voterName: voterName,
-                    votes: votes,
+                    scores: scores,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 };
 
-                await database.ref('votes').push(voteData);
+                await database.ref('scores').push(voteData);
 
-                // Show success message
                 document.getElementById('votingForm').classList.add('hidden');
                 document.getElementById('successMessage').classList.remove('hidden');
-                document.getElementById('voterNameDisplay').textContent = `ผู้โหวต: ${voterName}`;
-
-                // Show vote summary
-                const summaryHTML = CATEGORIES.map(category => {
-                    const contestant = CONTESTANTS.find(c => c.id === votes[category.id]);
-                    return `
-                        <div class="mb-2">
-                            <span class="text-gray-700">${category.name}:</span>
-                            <span class="font-semibold text-blue-700 ml-2">${contestant.name}</span>
-                        </div>
-                    `;
-                }).join('');
-                document.getElementById('voteSummary').innerHTML = summaryHTML;
+                document.getElementById('voterNameDisplay').textContent = `ผู้ให้คะแนน: ${voterName}`;
 
             } catch (error) {
                 alert('เกิดข้อผิดพลาด: ' + error.message);
                 this.disabled = false;
-                this.innerHTML = '<span>📤</span> ส่งคะแนนโหวต';
+                this.innerHTML = '<span>📤</span> ส่งคะแนน';
             }
         });
 
         // Vote Again
         document.getElementById('voteAgainBtn').addEventListener('click', function() {
-            votes = {};
+            // Reset scores
+            CONTESTANTS.forEach(contestant => {
+                CATEGORIES.forEach(category => {
+                    scores[contestant.id][category.id] = 0;
+                });
+            });
+
             document.getElementById('voterName').value = '';
             document.getElementById('votingForm').classList.remove('hidden');
             document.getElementById('successMessage').classList.add('hidden');
             document.getElementById('submitBtn').disabled = false;
-            document.getElementById('submitBtn').innerHTML = '<span>📤</span> ส่งคะแนนโหวต';
-            renderCategories();
+            document.getElementById('submitBtn').innerHTML = '<span>📤</span> ส่งคะแนน';
+            
+            renderScoringGrid();
+            updateProgress();
         });
 
         // Initialize
-        renderCategories();
+        renderScoringGrid();
+        updateProgress();
     </script>
 </body>
 </html>
