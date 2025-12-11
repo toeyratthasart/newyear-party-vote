@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Varinda's VOTE 2025</title>
+    <title>Dashboard ผลคะแนนประกวดชุด</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -16,16 +16,16 @@
             <div class="flex items-center justify-between mb-4 flex-wrap gap-4">
                 <div>
                     <h1 class="text-4xl font-bold text-white mb-2">
-                        🎯 Dashboard Varinda's VOTE
+                        🏆 ผลคะแนนประกวดชุดปีใหม่ 2025
                     </h1>
-                    <p class="text-slate-300">แสดงผลโหวตแบบเรียลไทม์</p>
+                    <p class="text-slate-300">แสดงผลแบบเรียลไทม์</p>
                 </div>
                 <div class="text-right">
                     <div class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-2xl shadow-lg">
                         <span>👥</span>
-                        <span id="totalVoters">0</span> คน
+                        <span id="totalJudges">0</span> คน
                     </div>
-                    <p class="text-slate-400 text-sm mt-2">จำนวนผู้โหวตทั้งหมด</p>
+                    <p class="text-slate-400 text-sm mt-2">จำนวนผู้ให้คะแนน</p>
                 </div>
             </div>
 
@@ -46,10 +46,6 @@
                         <span>📊</span> Export Excel
                     </button>
                     
-                    <button id="exportJsonBtn" class="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-all">
-                        <span>📋</span> Export JSON
-                    </button>
-                    
                     <span id="lastUpdate" class="text-slate-400 text-sm"></span>
                     
                     <button id="resetBtn" class="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-all">
@@ -59,180 +55,245 @@
             </div>
         </div>
 
-        <!-- No Votes Message -->
-        <div id="noVotesMessage" class="hidden bg-slate-800 rounded-2xl shadow-2xl p-12 text-center border border-slate-700">
+        <!-- No Scores Message -->
+        <div id="noScoresMessage" class="hidden bg-slate-800 rounded-2xl shadow-2xl p-12 text-center border border-slate-700">
             <div class="text-6xl mb-4">👥</div>
             <h2 class="text-2xl font-bold text-slate-400 mb-2">
-                ยังไม่มีคะแนนโหวต
+                ยังไม่มีคะแนน
             </h2>
             <p class="text-slate-500">
-                รอผู้เข้าร่วมลงคะแนนผ่านหน้าโหวต
+                รอผู้ให้คะแนนผ่านหน้าโหวต
             </p>
         </div>
 
         <!-- Results Container -->
         <div id="resultsContainer" class="space-y-6">
-            <!-- Overall Winner -->
+            <!-- Overall Ranking -->
             <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-2xl shadow-2xl p-8 border-4 border-yellow-400">
                 <div class="flex items-center justify-center gap-3 mb-6">
                     <span class="text-5xl">🏆</span>
                     <h2 class="text-3xl font-bold text-yellow-900">
-                        ผู้ได้คะแนนสูงสุดรวม
+                        อันดับคะแนนรวม
                     </h2>
                 </div>
-                <div id="overallWinner" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+                <div id="overallRanking" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
             </div>
 
-            <!-- Category Charts -->
-            <div id="categoryCharts"></div>
+            <!-- Category Scores -->
+            <div id="categoryScores"></div>
 
-            <!-- Voter List -->
+            <!-- Detailed Table -->
+            <div class="bg-slate-800 rounded-2xl shadow-2xl p-8 border border-slate-700">
+                <h3 class="text-2xl font-bold text-white mb-6">📋 ตารางคะแนนรายละเอียด</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-white">
+                        <thead class="bg-slate-700">
+                            <tr>
+                                <th class="p-3 text-left">อันดับ</th>
+                                <th class="p-3 text-left">ชื่อ</th>
+                                <th class="p-3 text-center">แผนก</th>
+                                <th class="p-3 text-center">หัวข้อ 1</th>
+                                <th class="p-3 text-center">หัวข้อ 2</th>
+                                <th class="p-3 text-center">หัวข้อ 3</th>
+                                <th class="p-3 text-center">หัวข้อ 4</th>
+                                <th class="p-3 text-center font-bold">คะแนนรวม</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailedTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Judges List -->
             <div class="bg-slate-800 rounded-2xl shadow-2xl p-8 border border-slate-700">
                 <h3 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
                     <span>👥</span>
-                    <span>รายชื่อผู้โหวต (<span id="voterCount">0</span> คน)</span>
+                    <span>รายชื่อผู้ให้คะแนน (<span id="judgeCount">0</span> คน)</span>
                 </h3>
-                <div id="voterList" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 max-h-64 overflow-y-auto"></div>
+                <div id="judgesList" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 max-h-64 overflow-y-auto"></div>
             </div>
         </div>
     </div>
 
     <script>
-        
+        // Firebase Config
         const firebaseConfig = {
-  apiKey: "AIzaSyBxQI-sxUkZshLoAq9sZQ5zKm-7NXyytfQ",
-  authDomain: "newyear-party-vote.firebaseapp.com",
-  databaseURL: "https://newyear-party-vote-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "newyear-party-vote",
-  storageBucket: "newyear-party-vote.firebasestorage.app",
-  messagingSenderId: "537539574238",
-  appId: "1:537539574238:web:b7ed2507d1bcfc3203854f"
-};
+            apiKey: "AIzaSyBxQI-sxUkZshLoAq9sZQ5zKm-7NXyytfQ",
+            authDomain: "newyear-party-vote.firebaseapp.com",
+            databaseURL: "https://newyear-party-vote-default-rtdb.asia-southeast1.firebaseio.com",
+            projectId: "newyear-party-vote",
+            storageBucket: "newyear-party-vote.firebasestorage.app",
+            messagingSenderId: "537539574238",
+            appId: "1:537539574238:web:b7ed2507d1bcfc3203854f"
+        };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
         // Configuration
         const CATEGORIES = [
-            { id: 'cat1', name: 'แต่งกายสวยที่สุด' },
-            { id: 'cat2', name: 'เต้นเก่งที่สุด' },
-            { id: 'cat3', name: 'ร้องเพลงเพราะที่สุด' },
-            { id: 'cat4', name: 'บุคลิกดีที่สุด' }
+            { id: 'cat1', name: 'ความเหมือน/เครื่องแต่งกายเข้ากับธีมงาน', short: 'ธีมงาน' },
+            { id: 'cat2', name: 'ความคิดสร้างสรรค์', short: 'สร้างสรรค์' },
+            { id: 'cat3', name: 'แรงบันดาลใจ/ที่มาของชุด', short: 'แรงบันดาลใจ' },
+            { id: 'cat4', name: 'การนำเสนอชุด', short: 'นำเสนอ' }
         ];
 
         const CONTESTANTS = [
-            { id: 'team-a', name: 'ทีม A', color: '#3B82F6' },
-            { id: 'team-b', name: 'ทีม B', color: '#10B981' },
-            { id: 'team-c', name: 'ทีม C', color: '#F59E0B' },
-            { id: 'team-d', name: 'ทีม D', color: '#EF4444' }
+            { id: 'p1', name: 'แมน', dept: 'DC' },
+            { id: 'p2', name: 'นิก', dept: 'DC' },
+            { id: 'p3', name: 'ดา', dept: 'Retail' },
+            { id: 'p4', name: 'บอส', dept: 'PD' },
+            { id: 'p5', name: 'เอื้อ', dept: 'PD' },
+            { id: 'p6', name: 'ไนซ์', dept: 'MKT' },
+            { id: 'p7', name: 'ตาล', dept: 'Import & Export' },
+            { id: 'p8', name: 'ไอซ์', dept: 'Import & Export' },
+            { id: 'p9', name: 'เฟิร์น', dept: 'HR' }
         ];
 
-        let allVotes = [];
+        const DEPT_COLORS = {
+            'DC': '#3B82F6',
+            'Retail': '#10B981',
+            'PD': '#F59E0B',
+            'MKT': '#EF4444',
+            'Import & Export': '#8B5CF6',
+            'HR': '#EC4899'
+        };
+
+        let allScores = [];
         let charts = {};
 
         // Listen to Firebase changes
-        database.ref('votes').on('value', (snapshot) => {
+        database.ref('scores').on('value', (snapshot) => {
             const data = snapshot.val();
-            allVotes = data ? Object.values(data) : [];
+            allScores = data ? Object.values(data) : [];
             updateDashboard();
         });
 
         function calculateResults() {
             const results = {};
             
-            CATEGORIES.forEach(category => {
-                results[category.id] = {};
-                CONTESTANTS.forEach(contestant => {
-                    results[category.id][contestant.id] = 0;
+            CONTESTANTS.forEach(contestant => {
+                results[contestant.id] = {
+                    name: contestant.name,
+                    dept: contestant.dept,
+                    categoryScores: {},
+                    categoryAvg: {},
+                    totalScore: 0,
+                    totalAvg: 0
+                };
+                
+                CATEGORIES.forEach(category => {
+                    results[contestant.id].categoryScores[category.id] = [];
+                    results[contestant.id].categoryAvg[category.id] = 0;
                 });
             });
 
-            allVotes.forEach(vote => {
-                Object.keys(vote.votes).forEach(categoryId => {
-                    const contestantId = vote.votes[categoryId];
-                    if (results[categoryId] && results[categoryId][contestantId] !== undefined) {
-                        results[categoryId][contestantId]++;
-                    }
+            // Collect all scores
+            allScores.forEach(scoreData => {
+                CONTESTANTS.forEach(contestant => {
+                    CATEGORIES.forEach(category => {
+                        const score = scoreData.scores[contestant.id][category.id];
+                        results[contestant.id].categoryScores[category.id].push(score);
+                    });
                 });
+            });
+
+            // Calculate averages
+            CONTESTANTS.forEach(contestant => {
+                let totalSum = 0;
+                CATEGORIES.forEach(category => {
+                    const scores = results[contestant.id].categoryScores[category.id];
+                    const avg = scores.length > 0 
+                        ? scores.reduce((a, b) => a + b, 0) / scores.length 
+                        : 0;
+                    results[contestant.id].categoryAvg[category.id] = avg;
+                    totalSum += avg;
+                });
+                results[contestant.id].totalAvg = totalSum;
             });
 
             return results;
         }
 
-        function getTotalVotesByContestant() {
-            const results = calculateResults();
-            const totals = {};
-            
-            CONTESTANTS.forEach(contestant => {
-                totals[contestant.id] = 0;
-                CATEGORIES.forEach(category => {
-                    totals[contestant.id] += results[category.id][contestant.id] || 0;
-                });
-            });
-
-            return CONTESTANTS.map(contestant => ({
-                id: contestant.id,
-                name: contestant.name,
-                votes: totals[contestant.id],
-                color: contestant.color
-            })).sort((a, b) => b.votes - a.votes);
-        }
-
         function updateDashboard() {
-            const totalVotes = allVotes.length;
-            document.getElementById('totalVoters').textContent = totalVotes;
-            document.getElementById('voterCount').textContent = totalVotes;
-            document.getElementById('lastUpdate').textContent = `อัปเดตล่าสุด: ${new Date().toLocaleTimeString('th-TH')}`;
+            const totalJudges = allScores.length;
+            document.getElementById('totalJudges').textContent = totalJudges;
+            document.getElementById('judgeCount').textContent = totalJudges;
+            document.getElementById('lastUpdate').textContent = `อัปเดตล่าสุด: ${new Date().toLocaleTimeString('th-TH', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                timeZone: 'Asia/Bangkok'
+            })}`;
 
-            if (totalVotes === 0) {
-                document.getElementById('noVotesMessage').classList.remove('hidden');
+            if (totalJudges === 0) {
+                document.getElementById('noScoresMessage').classList.remove('hidden');
                 document.getElementById('resultsContainer').classList.add('hidden');
                 return;
             }
 
-            document.getElementById('noVotesMessage').classList.add('hidden');
+            document.getElementById('noScoresMessage').classList.add('hidden');
             document.getElementById('resultsContainer').classList.remove('hidden');
 
-            updateOverallWinner();
-            updateCategoryCharts();
-            updateVoterList();
+            updateOverallRanking();
+            updateCategoryScores();
+            updateDetailedTable();
+            updateJudgesList();
         }
 
-        function updateOverallWinner() {
-            const totals = getTotalVotesByContestant();
-            const html = totals.map((contestant, idx) => `
-                <div class="bg-white rounded-xl p-6 transition-all ${idx === 0 ? 'ring-4 ring-yellow-700 transform scale-110 shadow-2xl' : 'shadow-lg'}">
-                    ${idx === 0 ? '<div class="text-center mb-2"><span class="inline-block bg-yellow-500 text-yellow-900 px-3 py-1 rounded-full text-sm font-bold">🏆 อันดับ 1</span></div>' : ''}
-                    <div class="w-16 h-16 rounded-full mx-auto mb-3" style="background-color: ${contestant.color}"></div>
-                    <p class="font-bold text-gray-800 text-lg text-center">${contestant.name}</p>
-                    <p class="text-4xl font-bold text-blue-600 text-center">${contestant.votes}</p>
-                    <p class="text-sm text-gray-600 text-center">คะแนนรวม</p>
-                </div>
-            `).join('');
-            document.getElementById('overallWinner').innerHTML = html;
-        }
-
-        function updateCategoryCharts() {
+        function updateOverallRanking() {
             const results = calculateResults();
-            const container = document.getElementById('categoryCharts');
+            const ranking = Object.values(results)
+                .sort((a, b) => b.totalAvg - a.totalAvg);
+
+            const html = ranking.slice(0, 3).map((contestant, idx) => {
+                const medals = ['🥇', '🥈', '🥉'];
+                const bgColors = ['bg-yellow-100', 'bg-gray-100', 'bg-orange-100'];
+                
+                return `
+                    <div class="${bgColors[idx]} rounded-xl p-6 ${idx === 0 ? 'ring-4 ring-yellow-700 transform scale-105' : 'shadow-lg'}">
+                        <div class="text-center mb-3">
+                            <span class="text-5xl">${medals[idx]}</span>
+                            <p class="font-bold text-gray-800 text-sm mt-2">อันดับ ${idx + 1}</p>
+                        </div>
+                        <div 
+                            class="w-16 h-16 rounded-full mx-auto mb-3"
+                            style="background-color: ${DEPT_COLORS[contestant.dept]}"
+                        ></div>
+                        <p class="font-bold text-gray-800 text-xl text-center">${contestant.name}</p>
+                        <p class="text-sm text-gray-600 text-center mb-2">${contestant.dept}</p>
+                        <p class="text-4xl font-bold text-blue-600 text-center">${contestant.totalAvg.toFixed(2)}</p>
+                        <p class="text-sm text-gray-600 text-center">คะแนนเฉลี่ย</p>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('overallRanking').innerHTML = html;
+        }
+
+        function updateCategoryScores() {
+            const results = calculateResults();
+            const container = document.getElementById('categoryScores');
             
             container.innerHTML = CATEGORIES.map(category => {
-                const chartData = CONTESTANTS.map(contestant => results[category.id][contestant.id] || 0);
-                const maxVotes = Math.max(...chartData);
-                const winner = CONTESTANTS[chartData.indexOf(maxVotes)];
+                const chartData = CONTESTANTS.map(contestant => ({
+                    name: results[contestant.id].name,
+                    score: results[contestant.id].categoryAvg[category.id],
+                    color: DEPT_COLORS[contestant.dept]
+                })).sort((a, b) => b.score - a.score);
+
+                const maxScore = Math.max(...chartData.map(d => d.score));
+                const winner = chartData[0];
                 
                 return `
                     <div class="bg-slate-800 rounded-2xl shadow-2xl p-8 border border-slate-700">
                         <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
-                            <h3 class="text-2xl font-bold text-white flex items-center gap-2">
-                                <span>📊</span>
-                                ${category.name}
+                            <h3 class="text-2xl font-bold text-white">
+                                📊 ${category.name}
                             </h3>
                             <div class="text-right">
                                 <p class="text-slate-400 text-sm">ผู้นำ:</p>
                                 <p class="text-xl font-bold text-yellow-400">${winner.name}</p>
-                                <p class="text-2xl font-bold text-white">${maxVotes} คะแนน</p>
+                                <p class="text-2xl font-bold text-white">${winner.score.toFixed(2)} คะแนน</p>
                             </div>
                         </div>
                         <canvas id="chart-${category.id}" height="80"></canvas>
@@ -240,9 +301,14 @@
                 `;
             }).join('');
 
+            // Create charts
             CATEGORIES.forEach(category => {
+                const results = calculateResults();
+                const chartData = CONTESTANTS.map(contestant => 
+                    results[contestant.id].categoryAvg[category.id]
+                );
+                
                 const ctx = document.getElementById(`chart-${category.id}`).getContext('2d');
-                const chartData = CONTESTANTS.map(contestant => results[category.id][contestant.id] || 0);
                 
                 if (charts[category.id]) {
                     charts[category.id].destroy();
@@ -253,9 +319,9 @@
                     data: {
                         labels: CONTESTANTS.map(c => c.name),
                         datasets: [{
-                            label: 'คะแนนโหวต',
+                            label: 'คะแนนเฉลี่ย',
                             data: chartData,
-                            backgroundColor: CONTESTANTS.map(c => c.color),
+                            backgroundColor: CONTESTANTS.map(c => DEPT_COLORS[c.dept]),
                             borderRadius: 10,
                         }]
                     },
@@ -266,13 +332,17 @@
                             legend: { display: false },
                             tooltip: {
                                 backgroundColor: '#1e293b',
-                                titleColor: '#fff',
-                                bodyColor: '#fff'
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'คะแนนเฉลี่ย: ' + context.parsed.y.toFixed(2);
+                                    }
+                                }
                             }
                         },
                         scales: {
                             y: {
                                 beginAtZero: true,
+                                max: 5,
                                 ticks: { 
                                     color: '#94a3b8',
                                     stepSize: 1
@@ -292,125 +362,115 @@
             });
         }
 
-        function updateVoterList() {
-            const html = allVotes.map((vote, idx) => {
-                const time = vote.timestamp ? new Date(vote.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' }) : 'N/A';
+        function updateDetailedTable() {
+            const results = calculateResults();
+            const ranking = Object.values(results)
+                .sort((a, b) => b.totalAvg - a.totalAvg);
+
+            const html = ranking.map((contestant, idx) => `
+                <tr class="border-b border-slate-700 hover:bg-slate-700">
+                    <td class="p-3 font-bold">${idx + 1}</td>
+                    <td class="p-3 font-bold">${contestant.name}</td>
+                    <td class="p-3 text-center">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold text-white" 
+                              style="background-color: ${DEPT_COLORS[contestant.dept]}">
+                            ${contestant.dept}
+                        </span>
+                    </td>
+                    ${CATEGORIES.map(cat => `
+                        <td class="p-3 text-center">${contestant.categoryAvg[cat.id].toFixed(2)}</td>
+                    `).join('')}
+                    <td class="p-3 text-center font-bold text-yellow-400 text-lg">
+                        ${contestant.totalAvg.toFixed(2)}
+                    </td>
+                </tr>
+            `).join('');
+            
+            document.getElementById('detailedTable').innerHTML = html;
+        }
+
+        function updateJudgesList() {
+            const html = allScores.map((score, idx) => {
+                const time = score.timestamp ? new Date(score.timestamp).toLocaleTimeString('th-TH', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    timeZone: 'Asia/Bangkok'
+                }) : 'N/A';
                 return `
                     <div class="bg-slate-700 rounded-lg p-3 text-center border border-slate-600">
-                        <p class="text-white font-semibold">${vote.voterName}</p>
+                        <p class="text-white font-semibold">${score.voterName}</p>
                         <p class="text-slate-400 text-xs mt-1">${time}</p>
                     </div>
                 `;
             }).join('');
-            document.getElementById('voterList').innerHTML = html;
+            document.getElementById('judgesList').innerHTML = html;
         }
 
-        // Export to CSV/Excel
+        // Export to Excel
         function exportToExcel() {
-            if (allVotes.length === 0) {
+            if (allScores.length === 0) {
                 alert('ยังไม่มีข้อมูลให้ Export');
                 return;
             }
 
-            // Create CSV content
-            let csv = '\uFEFF'; // UTF-8 BOM for Excel
-            csv += 'ลำดับ,ชื่อผู้โหวต,เวลา';
-            
-            // Add category headers
-            CATEGORIES.forEach(cat => {
-                csv += ',' + cat.name;
-            });
+            const results = calculateResults();
+            const ranking = Object.values(results).sort((a, b) => b.totalAvg - a.totalAvg);
+
+            let csv = '\uFEFF';
+            csv += 'อันดับ,ชื่อ,แผนก';
+            CATEGORIES.forEach(cat => csv += ',' + cat.short);
             csv += ',คะแนนรวม\n';
 
-            // Add data rows
-            allVotes.forEach((vote, idx) => {
-                const time = vote.timestamp ? new Date(vote.timestamp).toLocaleString('th-TH') : 'N/A';
-                csv += `${idx + 1},"${vote.voterName}","${time}"`;
-                
-                let totalPoints = 0;
+            ranking.forEach((contestant, idx) => {
+                csv += `${idx + 1},"${contestant.name}","${contestant.dept}"`;
                 CATEGORIES.forEach(cat => {
-                    const contestantId = vote.votes[cat.id];
-                    const contestant = CONTESTANTS.find(c => c.id === contestantId);
-                    csv += ',' + (contestant ? contestant.name : 'N/A');
-                    if (contestant) totalPoints++;
+                    csv += ',' + contestant.categoryAvg[cat.id].toFixed(2);
                 });
+                csv += ',' + contestant.totalAvg.toFixed(2) + '\n';
+            });
+
+            csv += '\n\n=== รายละเอียดคะแนนแต่ละคน ===\n';
+            allScores.forEach((scoreData, idx) => {
+                const time = scoreData.timestamp ? new Date(scoreData.timestamp).toLocaleString('th-TH', {
+                    timeZone: 'Asia/Bangkok'
+                }) : 'N/A';
+                csv += `\nผู้ให้คะแนนคนที่ ${idx + 1}: ${scoreData.voterName} (${time})\n`;
+                csv += 'ชื่อ';
+                CATEGORIES.forEach(cat => csv += ',' + cat.short);
+                csv += '\n';
                 
-                csv += ',' + totalPoints + '\n';
-            });
-
-            // Add summary
-            csv += '\n\n=== สรุปผลรวม ===\n';
-            csv += 'ทีม,คะแนนรวม\n';
-            
-            const totals = getTotalVotesByContestant();
-            totals.forEach(t => {
-                csv += `${t.name},${t.votes}\n`;
-            });
-
-            // Add category breakdown
-            csv += '\n=== สรุปแยกตามหัวข้อ ===\n';
-            const results = calculateResults();
-            CATEGORIES.forEach(cat => {
-                csv += `\n${cat.name}\n`;
-                csv += 'ทีม,คะแนน\n';
                 CONTESTANTS.forEach(contestant => {
-                    csv += `${contestant.name},${results[cat.id][contestant.id]}\n`;
+                    csv += contestant.name;
+                    CATEGORIES.forEach(cat => {
+                        csv += ',' + scoreData.scores[contestant.id][cat.id];
+                    });
+                    csv += '\n';
                 });
             });
 
-            // Download
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
             link.setAttribute('href', url);
-            link.setAttribute('download', `voting-results-${new Date().toISOString().slice(0,10)}.csv`);
+            link.setAttribute('download', `costume-contest-${new Date().toISOString().slice(0,10)}.csv`);
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         }
 
-        // Export to JSON
-        function exportToJson() {
-            if (allVotes.length === 0) {
-                alert('ยังไม่มีข้อมูลให้ Export');
-                return;
-            }
-
-            const exportData = {
-                exportDate: new Date().toISOString(),
-                totalVotes: allVotes.length,
-                categories: CATEGORIES,
-                contestants: CONTESTANTS,
-                votes: allVotes,
-                summary: {
-                    overall: getTotalVotesByContestant(),
-                    byCategory: calculateResults()
-                }
-            };
-
-            const json = JSON.stringify(exportData, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', `voting-results-${new Date().toISOString().slice(0,10)}.json`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // Event listeners
         document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
-        document.getElementById('exportJsonBtn').addEventListener('click', exportToJson);
 
         // Auto refresh
         let autoRefreshInterval;
         document.getElementById('autoRefresh').addEventListener('change', function() {
             if (this.checked) {
                 autoRefreshInterval = setInterval(() => {
-                    document.getElementById('lastUpdate').textContent = `อัปเดตล่าสุด: ${new Date().toLocaleTimeString('th-TH')}`;
+                    document.getElementById('lastUpdate').textContent = `อัปเดตล่าสุด: ${new Date().toLocaleTimeString('th-TH', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        timeZone: 'Asia/Bangkok'
+                    })}`;
                 }, 5000);
             } else {
                 clearInterval(autoRefreshInterval);
@@ -424,7 +484,7 @@
         document.getElementById('resetBtn').addEventListener('click', async () => {
             if (confirm('⚠️ คุณแน่ใจหรือไม่ว่าต้องการล้างคะแนนทั้งหมด?\n\nการกระทำนี้ไม่สามารถย้อนกลับได้!')) {
                 try {
-                    await database.ref('votes').remove();
+                    await database.ref('scores').remove();
                     alert('✅ ล้างคะแนนเรียบร้อยแล้ว');
                 } catch (error) {
                     alert('❌ เกิดข้อผิดพลาด: ' + error.message);
@@ -434,7 +494,11 @@
 
         // Start auto refresh
         autoRefreshInterval = setInterval(() => {
-            document.getElementById('lastUpdate').textContent = `อัปเดตล่าสุด: ${new Date().toLocaleTimeString('th-TH')}`;
+            document.getElementById('lastUpdate').textContent = `อัปเดตล่าสุด: ${new Date().toLocaleTimeString('th-TH', {
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'Asia/Bangkok'
+            })}`;
         }, 5000);
     </script>
 </body>
