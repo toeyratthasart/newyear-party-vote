@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบโหวตงานปีใหม่ 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 min-h-screen p-4">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="bg-white rounded-2xl shadow-2xl p-6 mb-6 text-center">
+            <h1 class="text-4xl font-bold text-blue-600 mb-2">
+                🎉 ระบบโหวตงานปีใหม่ 2025 🎉
+            </h1>
+            <p class="text-gray-600">เลือกผู้ชนะในแต่ละหัวข้อ</p>
+            <div class="mt-4 inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-semibold">
+                📝 หน้าสำหรับผู้โหวต
+            </div>
+        </div>
+
+        <!-- Voting Form -->
+        <div id="votingForm" class="bg-white rounded-2xl shadow-2xl p-8">
+            <!-- Name Input -->
+            <div class="mb-8">
+                <label class="block text-lg font-semibold text-gray-700 mb-2">
+                    ชื่อของคุณ *
+                </label>
+                <input
+                    type="text"
+                    id="voterName"
+                    placeholder="กรอกชื่อของคุณ"
+                    class="w-full px-4 py-3 border-2 border-blue-300 rounded-lg focus:outline-none focus:border-blue-500 text-lg"
+                />
+            </div>
+
+            <!-- Categories -->
+            <div id="categoriesContainer"></div>
+
+            <!-- Submit Button -->
+            <button
+                id="submitBtn"
+                class="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-xl transition-all shadow-lg transform hover:scale-105 hover:from-blue-700 hover:to-blue-800 flex items-center justify-center gap-2"
+            >
+                <span>📤</span>
+                ส่งคะแนนโหวต
+            </button>
+        </div>
+
+        <!-- Success Message (Hidden Initially) -->
+        <div id="successMessage" class="hidden bg-white rounded-2xl shadow-2xl p-8">
+            <div class="text-center py-12">
+                <div class="text-6xl mb-4">✅</div>
+                <h2 class="text-3xl font-bold text-green-600 mb-2">
+                    ขอบคุณสำหรับการโหวต!
+                </h2>
+                <p class="text-gray-600 mb-2">คะแนนของคุณถูกบันทึกเรียบร้อยแล้ว</p>
+                <p id="voterNameDisplay" class="text-sm text-gray-500 mb-8"></p>
+                
+                <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 mb-6">
+                    <h3 class="font-bold text-blue-800 mb-3">สรุปคะแนนของคุณ:</h3>
+                    <div id="voteSummary" class="text-left space-y-2"></div>
+                </div>
+
+                <button
+                    id="voteAgainBtn"
+                    class="px-8 py-3 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 transition-all"
+                >
+                    โหวตอีกครั้ง
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-6 text-white">
+            <p class="text-sm opacity-80">
+                💡 สำหรับผู้ดูแลระบบ: เปิดไฟล์ dashboard.html เพื่อดูผลโหวตเรียลไทม์
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ ใส่ Firebase Config ของคุณที่นี่
+const firebaseConfig = {
+  apiKey: "AIzaSyBxQI-sxUkZshLoAq9sZQ5zKm-7NXyytfQ",
+  authDomain: "newyear-party-vote.firebaseapp.com",
+  databaseURL: "https://newyear-party-vote-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "newyear-party-vote",
+  storageBucket: "newyear-party-vote.firebasestorage.app",
+  messagingSenderId: "537539574238",
+  appId: "1:537539574238:web:b7ed2507d1bcfc3203854f"
+};
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Configuration
+        const CATEGORIES = [
+            { id: 'cat1', name: 'แต่งกายสวยที่สุด' },
+            { id: 'cat2', name: 'เต้นเก่งที่สุด' },
+            { id: 'cat3', name: 'ร้องเพลงเพราะที่สุด' },
+            { id: 'cat4', name: 'บุคลิกดีที่สุด' }
+        ];
+
+        const CONTESTANTS = [
+            { id: 'team-a', name: 'ทีม A', color: '#3B82F6' },
+            { id: 'team-b', name: 'ทีม B', color: '#10B981' },
+            { id: 'team-c', name: 'ทีม C', color: '#F59E0B' },
+            { id: 'team-d', name: 'ทีม D', color: '#EF4444' }
+        ];
+
+        let votes = {};
+
+        // Render Categories
+        function renderCategories() {
+            const container = document.getElementById('categoriesContainer');
+            container.innerHTML = CATEGORIES.map((category, idx) => `
+                <div class="mb-8 pb-8 border-b border-gray-200 last:border-b-0">
+                    <h3 class="text-2xl font-bold text-blue-700 mb-4">
+                        ${idx + 1}. ${category.name}
+                        <span id="check-${category.id}" class="ml-2 text-green-600 hidden">✓</span>
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        ${CONTESTANTS.map(contestant => `
+                            <button
+                                data-category="${category.id}"
+                                data-contestant="${contestant.id}"
+                                class="contestant-btn p-6 rounded-xl border-3 border-gray-300 bg-white transition-all transform hover:scale-105 hover:border-blue-300"
+                            >
+                                <div class="text-center">
+                                    <div class="w-16 h-16 rounded-full mx-auto mb-3" style="background-color: ${contestant.color}"></div>
+                                    <p class="font-semibold text-gray-800">${contestant.name}</p>
+                                    <p class="check-mark text-blue-600 text-sm mt-2 hidden">✓ เลือกแล้ว</p>
+                                </div>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            // Add event listeners
+            document.querySelectorAll('.contestant-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const categoryId = this.dataset.category;
+                    const contestantId = this.dataset.contestant;
+                    selectContestant(categoryId, contestantId);
+                });
+            });
+        }
+
+        function selectContestant(categoryId, contestantId) {
+            votes[categoryId] = contestantId;
+
+            // Update UI
+            document.querySelectorAll(`[data-category="${categoryId}"]`).forEach(btn => {
+                btn.classList.remove('border-blue-500', 'bg-blue-50', 'shadow-lg', 'scale-105');
+                btn.classList.add('border-gray-300', 'bg-white');
+                btn.querySelector('.check-mark').classList.add('hidden');
+            });
+
+            const selectedBtn = document.querySelector(`[data-category="${categoryId}"][data-contestant="${contestantId}"]`);
+            selectedBtn.classList.remove('border-gray-300', 'bg-white');
+            selectedBtn.classList.add('border-blue-500', 'bg-blue-50', 'shadow-lg', 'scale-105');
+            selectedBtn.querySelector('.check-mark').classList.remove('hidden');
+
+            document.getElementById(`check-${categoryId}`).classList.remove('hidden');
+        }
+
+        // Submit Vote
+        document.getElementById('submitBtn').addEventListener('click', async function() {
+            const voterName = document.getElementById('voterName').value.trim();
+
+            if (!voterName) {
+                alert('กรุณากรอกชื่อของคุณ');
+                return;
+            }
+
+            const allCategoriesVoted = CATEGORIES.every(cat => votes[cat.id]);
+            if (!allCategoriesVoted) {
+                alert('กรุณาโหวตให้ครบทุกหัวข้อ');
+                return;
+            }
+
+            this.disabled = true;
+            this.innerHTML = '<span>⏳</span> กำลังบันทึก...';
+
+            try {
+                const voteData = {
+                    voterName: voterName,
+                    votes: votes,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
+
+                await database.ref('votes').push(voteData);
+
+                // Show success message
+                document.getElementById('votingForm').classList.add('hidden');
+                document.getElementById('successMessage').classList.remove('hidden');
+                document.getElementById('voterNameDisplay').textContent = `ผู้โหวต: ${voterName}`;
+
+                // Show vote summary
+                const summaryHTML = CATEGORIES.map(category => {
+                    const contestant = CONTESTANTS.find(c => c.id === votes[category.id]);
+                    return `
+                        <div class="mb-2">
+                            <span class="text-gray-700">${category.name}:</span>
+                            <span class="font-semibold text-blue-700 ml-2">${contestant.name}</span>
+                        </div>
+                    `;
+                }).join('');
+                document.getElementById('voteSummary').innerHTML = summaryHTML;
+
+            } catch (error) {
+                alert('เกิดข้อผิดพลาด: ' + error.message);
+                this.disabled = false;
+                this.innerHTML = '<span>📤</span> ส่งคะแนนโหวต';
+            }
+        });
+
+        // Vote Again
+        document.getElementById('voteAgainBtn').addEventListener('click', function() {
+            votes = {};
+            document.getElementById('voterName').value = '';
+            document.getElementById('votingForm').classList.remove('hidden');
+            document.getElementById('successMessage').classList.add('hidden');
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('submitBtn').innerHTML = '<span>📤</span> ส่งคะแนนโหวต';
+            renderCategories();
+        });
+
+        // Initialize
+        renderCategories();
+    </script>
+</body>
+</html>
