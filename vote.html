@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบโหวตงานปีใหม่ 2025</title>
+    <title>New Year Party Vote</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -13,7 +13,7 @@
         <!-- Header -->
         <div class="bg-white rounded-2xl shadow-2xl p-6 mb-6 text-center">
             <h1 class="text-4xl font-bold text-blue-600 mb-2">
-                🎉 ระบบโหวตงานปีใหม่ 2025 🎉
+                🎉 New Year Party Vote 🎉
             </h1>
             <p class="text-gray-600">เลือกผู้ชนะในแต่ละหัวข้อ</p>
             <div class="mt-4 inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-semibold">
@@ -31,7 +31,7 @@
                 <input
                     type="text"
                     id="voterName"
-                    placeholder="กรอกชื่อของคุณ"
+                    placeholder="กรอกNew Year Party Vote"
                     class="w-full px-4 py-3 border-2 border-blue-300 rounded-lg focus:outline-none focus:border-blue-500 text-lg"
                 />
             </div>
@@ -76,7 +76,7 @@
         <!-- Footer -->
         <div class="text-center mt-6 text-white">
             <p class="text-sm opacity-80">
-                💡 สำหรับผู้ดูแลระบบ: เปิดไฟล์ dashboard.html เพื่อดูผลโหวตเรียลไทม์
+                💡 สำหรับผู้ดูแลระบบ: เปิด dashboard เพื่อดูผลโหวตเรียลไทม์
             </p>
         </div>
     </div>
@@ -174,7 +174,7 @@ const firebaseConfig = {
             const voterName = document.getElementById('voterName').value.trim();
 
             if (!voterName) {
-                alert('กรุณากรอกชื่อของคุณ');
+                alert('กรุณากรอกNew Year Party Vote');
                 return;
             }
 
