@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard ผู้ดูแลระบบ - งานปีใหม่ 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-800 via-slate-900 to-blue-900 min-h-screen p-4">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-slate-700 to-slate-800 rounded-2xl shadow-2xl p-6 mb-6 border border-slate-600">
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-4">
+                <div>
+                    <h1 class="text-4xl font-bold text-white mb-2">
+                        🎯 Dashboard ผู้ดูแลระบบ
+                    </h1>
+                    <p class="text-slate-300">แสดงผลโหวตแบบเรียลไทม์</p>
+                </div>
+                <div class="text-right">
+                    <div class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-2xl shadow-lg">
+                        <span>👥</span>
+                        <span id="totalVoters">0</span> คน
+                    </div>
+                    <p class="text-slate-400 text-sm mt-2">จำนวนผู้โหวตทั้งหมด</p>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-4 border-t border-slate-600 flex-wrap gap-4">
+                <div class="flex items-center gap-4 flex-wrap">
+                    <button id="refreshBtn" class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">
+                        <span>🔄</span> รีเฟรช
+                    </button>
+                    
+                    <label class="flex items-center gap-2 text-white cursor-pointer">
+                        <input type="checkbox" id="autoRefresh" checked class="w-5 h-5" />
+                        <span>รีเฟรชอัตโนมัติ (ทุก 5 วินาที)</span>
+                    </label>
+                </div>
+
+                <div class="flex items-center gap-4 flex-wrap">
+                    <span id="lastUpdate" class="text-slate-400 text-sm"></span>
+                    
+                    <button id="resetBtn" class="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-all">
+                        <span>🗑️</span> ล้างคะแนนทั้งหมด
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Votes Message -->
+        <div id="noVotesMessage" class="hidden bg-slate-800 rounded-2xl shadow-2xl p-12 text-center border border-slate-700">
+            <div class="text-6xl mb-4">👥</div>
+            <h2 class="text-2xl font-bold text-slate-400 mb-2">
+                ยังไม่มีคะแนนโหวต
+            </h2>
+            <p class="text-slate-500">
+                รอผู้เข้าร่วมลงคะแนนผ่านหน้าโหวต
+            </p>
+        </div>
+
+        <!-- Results Container -->
+        <div id="resultsContainer" class="space-y-6">
+            <!-- Overall Winner -->
+            <div class="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-2xl shadow-2xl p-8 border-4 border-yellow-400">
+                <div class="flex items-center justify-center gap-3 mb-6">
+                    <span class="text-5xl">🏆</span>
+                    <h2 class="text-3xl font-bold text-yellow-900">
+                        ผู้ได้คะแนนสูงสุดรวม
+                    </h2>
+                </div>
+                <div id="overallWinner" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+            </div>
+
+            <!-- Category Charts -->
+            <div id="categoryCharts"></div>
+
+            <!-- Voter List -->
+            <div class="bg-slate-800 rounded-2xl shadow-2xl p-8 border border-slate-700">
+                <h3 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                    <span>👥</span>
+                    <span>รายชื่อผู้โหวต (<span id="voterCount">0</span> คน)</span>
+                </h3>
+                <div id="voterList" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 max-h-64 overflow-y-auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ ใส่ Firebase Config เดียวกับ vote.html
+const firebaseConfig = {
+  apiKey: "AIzaSyBxQI-sxUkZshLoAq9sZQ5zKm-7NXyytfQ",
+  authDomain: "newyear-party-vote.firebaseapp.com",
+  databaseURL: "https://newyear-party-vote-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "newyear-party-vote",
+  storageBucket: "newyear-party-vote.firebasestorage.app",
+  messagingSenderId: "537539574238",
+  appId: "1:537539574238:web:b7ed2507d1bcfc3203854f"
+};
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Configuration
+        const CATEGORIES = [
+            { id: 'cat1', name: 'แต่งกายสวยที่สุด' },
+            { id: 'cat2', name: 'เต้นเก่งที่สุด' },
+            { id: 'cat3', name: 'ร้องเพลงเพราะที่สุด' },
+            { id: 'cat4', name: 'บุคลิกดีที่สุด' }
+        ];
+
+        const CONTESTANTS = [
+            { id: 'team-a', name: 'ทีม A', color: '#3B82F6' },
+            { id: 'team-b', name: 'ทีม B', color: '#10B981' },
+            { id: 'team-c', name: 'ทีม C', color: '#F59E0B' },
+            { id: 'team-d', name: 'ทีม D', color: '#EF4444' }
+        ];
+
+        let allVotes = [];
+        let charts = {};
+
+        // Listen to Firebase changes
+        database.ref('votes').on('value', (snapshot) => {
+            const data = snapshot.val();
+            allVotes = data ? Object.values(data) : [];
+            updateDashboard();
+        });
+
+        function calculateResults() {
+            const results = {};
+            
+            CATEGORIES.forEach(category => {
+                results[category.id] = {};
+                CONTESTANTS.forEach(contestant => {
+                    results[category.id][contestant.id] = 0;
+                });
+            });
+
+            allVotes.forEach(vote => {
+                Object.keys(vote.votes).forEach(categoryId => {
+                    const contestantId = vote.votes[categoryId];
+                    if (results[categoryId] && results[categoryId][contestantId] !== undefined) {
+                        results[categoryId][contestantId]++;
+                    }
+                });
+            });
+
+            return results;
+        }
+
+        function getTotalVotesByContestant() {
+            const results = calculateResults();
+            const totals = {};
+            
+            CONTESTANTS.forEach(contestant => {
+                totals[contestant.id] = 0;
+                CATEGORIES.forEach(category => {
+                    totals[contestant.id] += results[category.id][contestant.id] || 0;
+                });
+            });
+
+            return CONTESTANTS.map(contestant => ({
+                id: contestant.id,
+                name: contestant.name,
+                votes: totals[contestant.id],
+                color: contestant.color
+            })).sort((a, b) => b.votes - a.votes);
+        }
+
+        function updateDashboard() {
+            const totalVotes = allVotes.length;
+            document.getElementById('totalVoters').textContent = totalVotes;
+            document.getElementById('voterCount').textContent = totalVotes;
+            document.getElementById('lastUpdate').textContent = `อัปเดตล่าสุด: ${new Date().toLocaleTimeString('th-TH')}`;
+
+            if (totalVotes === 0) {
+                document.getElementById('noVotesMessage').classList.remove('hidden');
+                document.getElementById('resultsContainer').classList.add('hidden');
+                return;
+            }
+
+            document.getElementById('noVotesMessage').classList.add('hidden');
+            document.getElementById('resultsContainer').classList.remove('hidden');
+
+            // Update overall winner
+            updateOverallWinner();
+
+            // Update category charts
+            updateCategoryCharts();
+
+            // Update voter list
+            updateVoterList();
+        }
+
+        function updateOverallWinner() {
+            const totals = getTotalVotesByContestant();
+            const html = totals.map((contestant, idx) => `
+                <div class="bg-white rounded-xl p-6 transition-all ${idx === 0 ? 'ring-4 ring-yellow-700 transform scale-110 shadow-2xl' : 'shadow-lg'}">
+                    ${idx === 0 ? '<div class="text-center mb-2"><span class="inline-block bg-yellow-500 text-yellow-900 px-3 py-1 rounded-full text-sm font-bold">🏆 อันดับ 1</span></div>' : ''}
+                    <div class="w-16 h-16 rounded-full mx-auto mb-3" style="background-color: ${contestant.color}"></div>
+                    <p class="font-bold text-gray-800 text-lg text-center">${contestant.name}</p>
+                    <p class="text-4xl font-bold text-blue-600 text-center">${contestant.votes}</p>
+                    <p class="text-sm text-gray-600 text-center">คะแนนรวม</p>
+                </div>
+            `).join('');
+            document.getElementById('overallWinner').innerHTML = html;
+        }
+
+        function updateCategoryCharts() {
+            const results = calculateResults();
+            const container = document.getElementById('categoryCharts');
+            
+            container.innerHTML = CATEGORIES.map(category => {
+                const chartData = CONTESTANTS.map(contestant => results[category.id][contestant.id] || 0);
+                const maxVotes = Math.max(...chartData);
+                const winner = CONTESTANTS[chartData.indexOf(maxVotes)];
+                
+                return `
+                    <div class="bg-slate-800 rounded-2xl shadow-2xl p-8 border border-slate-700">
+                        <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+                            <h3 class="text-2xl font-bold text-white flex items-center gap-2">
+                                <span>📊</span>
+                                ${category.name}
+                            </h3>
+                            <div class="text-right">
+                                <p class="text-slate-400 text-sm">ผู้นำ:</p>
+                                <p class="text-xl font-bold text-yellow-400">${winner.name}</p>
+                                <p class="text-2xl font-bold text-white">${maxVotes} คะแนน</p>
+                            </div>
+                        </div>
+                        <canvas id="chart-${category.id}" height="80"></canvas>
+                    </div>
+                `;
+            }).join('');
+
+            // Create charts
+            CATEGORIES.forEach(category => {
+                const ctx = document.getElementById(`chart-${category.id}`).getContext('2d');
+                const chartData = CONTESTANTS.map(contestant => results[category.id][contestant.id] || 0);
+                
+                if (charts[category.id]) {
+                    charts[category.id].destroy();
+                }
+                
+                charts[category.id] = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: CONTESTANTS.map(c => c.name),
+                        datasets: [{
+                            label: 'คะแนนโหวต',
+                            data: chartData,
+                            backgroundColor: CONTESTANTS.map(c => c.color),
+                            borderRadius: 10,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#1e293b',
+                                titleColor: '#fff',
+                                bodyColor: '#fff'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { 
+                                    color: '#94a3b8',
+                                    stepSize: 1
+                                },
+                                grid: { color: '#475569' }
+                            },
+                            x: {
+                                ticks: { 
+                                    color: '#94a3b8',
+                                    font: { weight: 'bold' }
+                                },
+                                grid: { display: false }
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        function updateVoterList() {
+            const html = allVotes.map((vote, idx) => {
+                const time = vote.timestamp ? new Date(vote.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) : 'N/A';
+                return `
+                    <div class="bg-slate-700 rounded-lg p-3 text-center border border-slate-600">
+                        <p class="text-white font-semibold">${vote.voterName}</p>
+                        <p class="text-slate-400 text-xs mt-1">${time}</p>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('voterList').innerHTML = html;
+        }
+
+        // Auto refresh
+        let autoRefreshInterval;
+        document.getElementById('autoRefresh').addEventListener('change', function() {
+            if (this.checked) {
+                autoRefreshInterval = setInterval(() => {
+                    document.getElementById('lastUpdate').textContent = `อัปเดตล่าสุด: ${new Date().toLocaleTimeString('th-TH')}`;
+                }, 5000);
+            } else {
+                clearInterval(autoRefreshInterval);
+            }
+        });
+
+        // Manual refresh
+        document.getElementById('refreshBtn').addEventListener('click', () => {
+            updateDashboard();
+        });
+
+        // Reset votes
+        document.getElementById('resetBtn').addEventListener('click', async () => {
+            if (confirm('⚠️ คุณแน่ใจหรือไม่ว่าต้องการล้างคะแนนทั้งหมด?\n\nการกระทำนี้ไม่สามารถย้อนกลับได้!')) {
+                try {
+                    await database.ref('votes').remove();
+                    alert('✅ ล้างคะแนนเรียบร้อยแล้ว');
+                } catch (error) {
+                    alert('❌ เกิดข้อผิดพลาด: ' + error.message);
+                }
+            }
+        });
+
+        // Start auto refresh
+        autoRefreshInterval = setInterval(() => {
+            document.getElementById('lastUpdate').textContent = `อัปเดตล่าสุด: ${new Date().toLocaleTimeString('th-TH')}`;
+        }, 5000);
+    </script>
+</body>
+</html>
