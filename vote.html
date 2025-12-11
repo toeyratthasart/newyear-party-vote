@@ -127,14 +127,14 @@
     <script>
         // Firebase Config (ใส่ข้อมูลจริงของคุณที่นี่)
         const firebaseConfig = {
-  apiKey: "AIzaSyBxQI-sxUkZshLoAq9sZQ5zKm-7NXyytfQ",
-  authDomain: "newyear-party-vote.firebaseapp.com",
-  databaseURL: "https://newyear-party-vote-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "newyear-party-vote",
-  storageBucket: "newyear-party-vote.firebasestorage.app",
-  messagingSenderId: "537539574238",
-  appId: "1:537539574238:web:b7ed2507d1bcfc3203854f"
-};
+            apiKey: "AIzaSyBxQI-sxUkZshLoAq9sZQ5zKm-7NXyytfQ",
+            authDomain: "newyear-party-vote.firebaseapp.com",
+            databaseURL: "https://newyear-party-vote-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "newyear-party-vote",
+            storageBucket: "newyear-party-vote.firebasestorage.app",
+            messagingSenderId: "537539574238",
+            appId: "1:537539574238:web:b7ed2507d1bcfc3203854f"
+        };
 
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
@@ -181,36 +181,73 @@
                 });
             });
         }
+        
+        // ฟังก์ชัน: ตรวจสอบว่าผู้เข้าประกวดคนนี้ให้คะแนนครบ 4 หัวข้อแล้วหรือยัง
+        function isContestantComplete(contestantId) {
+            return CATEGORIES.every(category => scores[contestantId][category.id] > 0);
+        }
 
+        // ฟังก์ชัน: สร้าง Dropdown ใหม่พร้อมสถานะ (✅/🔶)
         function initializeVotingUI() {
             const select = document.getElementById('contestantSelect');
+            const selectedValue = select.value; // เก็บค่าที่ถูกเลือกไว้
+            select.innerHTML = ''; // ล้าง Dropdown เดิม
             
-            // 1. Render Dropdown Options
+            // เพิ่ม Option แรกที่เป็น Default
+            const defaultOption = document.createElement('option');
+            defaultOption.value = "";
+            defaultOption.textContent = "-- เลือกผู้เข้าประกวด --";
+            defaultOption.disabled = true;
+            if (!selectedValue) {
+                defaultOption.selected = true;
+            }
+            select.appendChild(defaultOption);
+
+
+            // 1. Render Dropdown Options พร้อมสถานะ
             CONTESTANTS.forEach(contestant => {
+                const isComplete = isContestantComplete(contestant.id);
+                const statusEmoji = isComplete ? '✅' : '🔶';
+                
                 const option = document.createElement('option');
                 option.value = contestant.id;
-                option.textContent = `${contestant.name} (${contestant.dept})`;
+                option.textContent = `${statusEmoji} ${contestant.name} (${contestant.dept})`;
+                
+                // หากผู้เข้าประกวดคนเดิมยังถูกเลือกอยู่ ให้ตั้งค่าเป็น Selected
+                if (contestant.id === selectedValue) {
+                    option.selected = true;
+                }
+                
                 select.appendChild(option);
             });
 
-            // 2. Add event listener for Dropdown change
-            select.addEventListener('change', function() {
-                currentContestantId = this.value;
-                const contestant = CONTESTANTS.find(c => c.id === currentContestantId);
-                
-                // Update Contestant Info
-                document.getElementById('currentContestantName').textContent = contestant.name;
-                document.getElementById('currentContestantDept').textContent = contestant.dept;
-                document.getElementById('contestantIcon').textContent = contestant.name.charAt(0);
-                document.getElementById('contestantIcon').style.backgroundColor = DEPT_COLORS[contestant.dept];
-                document.getElementById('scoringArea').classList.remove('hidden');
-                
-                renderCategoryScores();
-                updateProgress();
-            });
+            // 2. Add event listener for Dropdown change (ป้องกันการเพิ่มซ้ำ)
+            if (!select.dataset.listenerAdded) {
+                select.addEventListener('change', function() {
+                    currentContestantId = this.value;
+                    const contestant = CONTESTANTS.find(c => c.id === currentContestantId);
+                    
+                    // Update Contestant Info
+                    document.getElementById('currentContestantName').textContent = contestant.name;
+                    document.getElementById('currentContestantDept').textContent = contestant.dept;
+                    document.getElementById('contestantIcon').textContent = contestant.name.charAt(0);
+                    document.getElementById('contestantIcon').style.backgroundColor = DEPT_COLORS[contestant.dept];
+                    document.getElementById('scoringArea').classList.remove('hidden');
+                    
+                    renderCategoryScores();
+                    updateProgress();
+                });
+                select.dataset.listenerAdded = true;
+            }
+
+            // ถ้ามีคนถูกเลือกอยู่แล้ว ให้เรนเดอร์คะแนนของคนนั้นซ้ำ
+            if (selectedValue) {
+                 currentContestantId = selectedValue;
+                 renderCategoryScores();
+            }
         }
 
-        // Render the 4 categories for the selected contestant
+        // Render the 4 categories for the selected contestant (แก้ไขปัญหาดาวล้น)
         function renderCategoryScores() {
             if (!currentContestantId) return;
 
@@ -218,7 +255,7 @@
             container.innerHTML = CATEGORIES.map((category, catIdx) => `
                 <div class="bg-gray-50 rounded-lg p-4 mb-4 border border-gray-200">
                     <p class="font-semibold text-gray-700 mb-3">${catIdx + 1}. ${category.name}</p>
-                    <div id="scoreBtns-${category.id}" class="flex gap-2 justify-between">
+                    <div id="scoreBtns-${category.id}" class="flex gap-1.5 justify-between">
                         ${[1, 2, 3, 4, 5].map(score => {
                             const isSelected = scores[currentContestantId][category.id] === score;
                             
@@ -243,10 +280,12 @@
                                 <button
                                     data-category="${category.id}"
                                     data-score="${score}"
-                                    class="score-btn flex-1 py-3 px-2 rounded-lg border-2 transition-all text-center font-bold ${colorClass} ${activeClass}"
+                                    class="score-btn flex-1 py-3 px-1 rounded-lg border-2 transition-all text-center font-bold text-sm ${colorClass} ${activeClass}"
                                 >
-                                    <div class="text-2xl mb-1">${score}</div>
-                                    <div class="text-xs text-gray-600">${'⭐'.repeat(score)}</div>
+                                    <div class="text-xl mb-1">${score}</div> 
+                                    <div class="text-[9px] text-gray-600 leading-none">
+                                        ${'⭐'.repeat(score)}
+                                    </div>
                                 </button>
                             `;
                         }).join('')}
@@ -269,7 +308,7 @@
         function selectScore(contestantId, categoryId, score, btnElement) {
             scores[contestantId][categoryId] = score;
 
-            // Update UI: Re-render the current category to reflect the selection
+            // Update UI: Re-render the current category and update progress/dropdown status
             renderCategoryScores();
             updateProgress();
         }
@@ -316,6 +355,9 @@
                 submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
                 submitBtn.classList.remove('from-green-600', 'to-green-700', 'hover:from-green-700', 'hover:to-green-800', 'bg-gradient-to-r');
             }
+
+            // 4. ***ปรับปรุง Dropdown เพื่อแสดงสถานะล่าสุด***
+            initializeVotingUI(); 
         }
 
         // --- Event Handlers ---
@@ -329,7 +371,6 @@
                 return;
             }
 
-            // Check if ALL scores are given (should be redundant if the button is enabled, but good practice)
             let allScored = true;
             CONTESTANTS.forEach(contestant => {
                 CATEGORIES.forEach(category => {
@@ -354,7 +395,7 @@
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 };
 
-                // บันทึกไปยัง path 'scores' ตามที่เราแก้ไข Rules แล้ว
+                // บันทึกไปยัง path 'scores' 
                 await database.ref('scores').push(voteData);
 
                 document.getElementById('votingForm').classList.add('hidden');
@@ -373,14 +414,17 @@
             initializeScores(); // Reset all scores to 0
             
             document.getElementById('voterName').value = '';
-            document.getElementById('contestantSelect').value = ''; // Reset dropdown
-            document.getElementById('scoringArea').classList.add('hidden'); // Hide scoring area
+            
+            // รีเซ็ต Dropdown state
+            document.getElementById('contestantSelect').value = ''; 
+            document.getElementById('scoringArea').classList.add('hidden'); 
+
             document.getElementById('votingForm').classList.remove('hidden');
             document.getElementById('successMessage').classList.add('hidden');
             document.getElementById('submitBtn').disabled = false;
             
             currentContestantId = null; 
-            updateProgress();
+            updateProgress(); // จะเรียก initializeVotingUI() เพื่อสร้าง Dropdown ใหม่
         });
 
         // Run on load
