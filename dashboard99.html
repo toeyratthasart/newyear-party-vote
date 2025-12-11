@@ -42,6 +42,14 @@
                 </div>
 
                 <div class="flex items-center gap-4 flex-wrap">
+                    <button id="exportExcelBtn" class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all">
+                        <span>📊</span> Export Excel
+                    </button>
+                    
+                    <button id="exportJsonBtn" class="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-all">
+                        <span>📋</span> Export JSON
+                    </button>
+                    
                     <span id="lastUpdate" class="text-slate-400 text-sm"></span>
                     
                     <button id="resetBtn" class="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-all">
@@ -90,8 +98,8 @@
     </div>
 
     <script>
-        // ⚠️ ใส่ Firebase Config เดียวกับ vote.html
-const firebaseConfig = {
+        
+        const firebaseConfig = {
   apiKey: "AIzaSyBxQI-sxUkZshLoAq9sZQ5zKm-7NXyytfQ",
   authDomain: "newyear-party-vote.firebaseapp.com",
   databaseURL: "https://newyear-party-vote-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -186,13 +194,8 @@ const firebaseConfig = {
             document.getElementById('noVotesMessage').classList.add('hidden');
             document.getElementById('resultsContainer').classList.remove('hidden');
 
-            // Update overall winner
             updateOverallWinner();
-
-            // Update category charts
             updateCategoryCharts();
-
-            // Update voter list
             updateVoterList();
         }
 
@@ -237,7 +240,6 @@ const firebaseConfig = {
                 `;
             }).join('');
 
-            // Create charts
             CATEGORIES.forEach(category => {
                 const ctx = document.getElementById(`chart-${category.id}`).getContext('2d');
                 const chartData = CONTESTANTS.map(contestant => results[category.id][contestant.id] || 0);
@@ -292,7 +294,7 @@ const firebaseConfig = {
 
         function updateVoterList() {
             const html = allVotes.map((vote, idx) => {
-                const time = vote.timestamp ? new Date(vote.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) : 'N/A';
+                const time = vote.timestamp ? new Date(vote.timestamp).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' }) : 'N/A';
                 return `
                     <div class="bg-slate-700 rounded-lg p-3 text-center border border-slate-600">
                         <p class="text-white font-semibold">${vote.voterName}</p>
@@ -302,6 +304,106 @@ const firebaseConfig = {
             }).join('');
             document.getElementById('voterList').innerHTML = html;
         }
+
+        // Export to CSV/Excel
+        function exportToExcel() {
+            if (allVotes.length === 0) {
+                alert('ยังไม่มีข้อมูลให้ Export');
+                return;
+            }
+
+            // Create CSV content
+            let csv = '\uFEFF'; // UTF-8 BOM for Excel
+            csv += 'ลำดับ,ชื่อผู้โหวต,เวลา';
+            
+            // Add category headers
+            CATEGORIES.forEach(cat => {
+                csv += ',' + cat.name;
+            });
+            csv += ',คะแนนรวม\n';
+
+            // Add data rows
+            allVotes.forEach((vote, idx) => {
+                const time = vote.timestamp ? new Date(vote.timestamp).toLocaleString('th-TH') : 'N/A';
+                csv += `${idx + 1},"${vote.voterName}","${time}"`;
+                
+                let totalPoints = 0;
+                CATEGORIES.forEach(cat => {
+                    const contestantId = vote.votes[cat.id];
+                    const contestant = CONTESTANTS.find(c => c.id === contestantId);
+                    csv += ',' + (contestant ? contestant.name : 'N/A');
+                    if (contestant) totalPoints++;
+                });
+                
+                csv += ',' + totalPoints + '\n';
+            });
+
+            // Add summary
+            csv += '\n\n=== สรุปผลรวม ===\n';
+            csv += 'ทีม,คะแนนรวม\n';
+            
+            const totals = getTotalVotesByContestant();
+            totals.forEach(t => {
+                csv += `${t.name},${t.votes}\n`;
+            });
+
+            // Add category breakdown
+            csv += '\n=== สรุปแยกตามหัวข้อ ===\n';
+            const results = calculateResults();
+            CATEGORIES.forEach(cat => {
+                csv += `\n${cat.name}\n`;
+                csv += 'ทีม,คะแนน\n';
+                CONTESTANTS.forEach(contestant => {
+                    csv += `${contestant.name},${results[cat.id][contestant.id]}\n`;
+                });
+            });
+
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `voting-results-${new Date().toISOString().slice(0,10)}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Export to JSON
+        function exportToJson() {
+            if (allVotes.length === 0) {
+                alert('ยังไม่มีข้อมูลให้ Export');
+                return;
+            }
+
+            const exportData = {
+                exportDate: new Date().toISOString(),
+                totalVotes: allVotes.length,
+                categories: CATEGORIES,
+                contestants: CONTESTANTS,
+                votes: allVotes,
+                summary: {
+                    overall: getTotalVotesByContestant(),
+                    byCategory: calculateResults()
+                }
+            };
+
+            const json = JSON.stringify(exportData, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `voting-results-${new Date().toISOString().slice(0,10)}.json`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Event listeners
+        document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
+        document.getElementById('exportJsonBtn').addEventListener('click', exportToJson);
 
         // Auto refresh
         let autoRefreshInterval;
@@ -315,12 +417,10 @@ const firebaseConfig = {
             }
         });
 
-        // Manual refresh
         document.getElementById('refreshBtn').addEventListener('click', () => {
             updateDashboard();
         });
 
-        // Reset votes
         document.getElementById('resetBtn').addEventListener('click', async () => {
             if (confirm('⚠️ คุณแน่ใจหรือไม่ว่าต้องการล้างคะแนนทั้งหมด?\n\nการกระทำนี้ไม่สามารถย้อนกลับได้!')) {
                 try {
