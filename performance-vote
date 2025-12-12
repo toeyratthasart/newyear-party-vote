@@ -94,7 +94,7 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Configuration (เพิ่มกิมมิก)
+        // Configuration (ใช้กิมมิกใหม่)
         const CATEGORIES = [
             { id: 'cat1', name: 'ความเป๊ะปัง! (ความสวยงามและพร้อมเพรียง)' },
             { id: 'cat2', name: 'อินเนอร์และลีลา (ต่อเนื่องในการแสดง)' },
