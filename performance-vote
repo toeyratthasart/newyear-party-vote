@@ -82,23 +82,23 @@
     <script>
         // Firebase Config
         const firebaseConfig = {
-            apiKey: "AIzaSyBxQI-sxUkZshLoAq9sZQ5zKm-7NXyytfQ",
-            authDomain: "newyear-party-vote.firebaseapp.com",
-            databaseURL: "https://newyear-party-vote-default-rtdb.asia-southeast1.firebaseio.com",
-            projectId: "newyear-party-vote",
-            storageBucket: "newyear-party-vote.firebasestorage.app",
-            messagingSenderId: "537539574238",
-            appId: "1:537539574238:web:b7ed2507d1bcfc3203854f"
-        };
+  apiKey: "AIzaSyBxQI-sxUkZshLoAq9sZQ5zKm-7NXyytfQ",
+  authDomain: "newyear-party-vote.firebaseapp.com",
+  databaseURL: "https://newyear-party-vote-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "newyear-party-vote",
+  storageBucket: "newyear-party-vote.firebasestorage.app",
+  messagingSenderId: "537539574238",
+  appId: "1:537539574238:web:b7ed2507d1bcfc3203854f"
+};
 
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
         // Configuration (ใช้กิมมิกใหม่)
         const CATEGORIES = [
-            { id: 'cat1', name: 'ความเป๊ะปัง! (ความสวยงามและพร้อมเพรียง)' },
-            { id: 'cat2', name: 'อินเนอร์และลีลา (ต่อเนื่องในการแสดง)' },
-            { id: 'cat3', name: 'Wow Factor (ความคิดริเริ่มสร้างสรรค์)' }
+            { id: 'cat1', name: 'ความสวยงาม ความพร้อมเพรียง' },
+            { id: 'cat2', name: 'ลีลา และความต่อเนื่องในการแสดง' },
+            { id: 'cat3', name: 'ความคิดริเริ่มสร้างสรรค์ ' }
         ];
 
         const TEAMS = [
