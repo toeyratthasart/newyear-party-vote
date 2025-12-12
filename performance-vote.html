@@ -1,345 +1,246 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบให้คะแนนการแสดงปีใหม่ 2025</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบให้คะแนนการแสดงปีใหม่ 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 </head>
 <body class="bg-gradient-to-br from-blue-400 via-cyan-500 to-blue-600 min-h-screen p-2 sm:p-4">
-    <div class="max-w-6xl mx-auto">
-        <!-- Header -->
-        <div class="bg-white rounded-2xl shadow-2xl p-4 sm:p-6 mb-4 sm:mb-6 text-center">
-            <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">
-                🎪 Varinda's Performance Awards 2025 🏆
-            </h1>
-            <p class="text-sm sm:text-base text-gray-600 mb-2">ให้คะแนนทั้ง 5 ทีม ใน 3 หัวข้อ (1-5 คะแนน)</p>
-            <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-3 mt-4">
-                <p class="font-semibold text-blue-800 mb-2 text-sm sm:text-base">เกณฑ์การให้คะแนน:</p>
-                <div class="grid grid-cols-5 gap-1 sm:gap-2 text-xs sm:text-sm text-center">
-                    <div class="bg-red-100 rounded p-1 sm:p-2">
-                        <div class="text-lg sm:text-xl">1</div>
-                        <div class="hidden sm:block">น้อยที่สุด</div>
-                    </div>
-                    <div class="bg-orange-100 rounded p-1 sm:p-2">
-                        <div class="text-lg sm:text-xl">2</div>
-                        <div class="hidden sm:block">น้อย</div>
-                    </div>
-                    <div class="bg-yellow-100 rounded p-1 sm:p-2">
-                        <div class="text-lg sm:text-xl">3</div>
-                        <div class="hidden sm:block">ปานกลาง</div>
-                    </div>
-                    <div class="bg-lime-100 rounded p-1 sm:p-2">
-                        <div class="text-lg sm:text-xl">4</div>
-                        <div class="hidden sm:block">ดี</div>
-                    </div>
-                    <div class="bg-green-100 rounded p-1 sm:p-2">
-                        <div class="text-lg sm:text-xl">5</div>
-                        <div class="hidden sm:block">ดีเยี่ยม</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="max-w-6xl mx-auto">
+                <div class="bg-white rounded-2xl shadow-2xl p-4 sm:p-6 mb-4 sm:mb-6 text-center">
+            <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">
+                🎪 Varinda's Performance Awards 2025 🏆
+            </h1>
+            <p class="text-sm sm:text-base text-gray-600 mb-2">ให้คะแนนทั้ง 5 ทีม ใน 3 หัวข้อ (1-5 คะแนน)</p>
+            <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-3 mt-4">
+                <p class="font-semibold text-blue-800 mb-2 text-sm sm:text-base">เกณฑ์การให้คะแนน:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-5 gap-1 sm:gap-2 text-xs sm:text-sm text-center">
+                    <div class="bg-red-100 rounded p-1 sm:p-2">
+                        <div class="text-lg sm:text-xl">1⭐</div>
+                        <div class="hidden sm:block">น้อยที่สุด</div>
+                    </div>
+                    <div class="bg-orange-100 rounded p-1 sm:p-2">
+                        <div class="text-lg sm:text-xl">2⭐⭐</div>
+                        <div class="hidden sm:block">น้อย</div>
+                    </div>
+                    <div class="bg-yellow-100 rounded p-1 sm:p-2">
+                        <div class="text-lg sm:text-xl">3⭐⭐⭐</div>
+                        <div class="hidden sm:block">ปานกลาง</div>
+                    </div>
+                    <div class="bg-lime-100 rounded p-1 sm:p-2">
+                        <div class="text-lg sm:text-xl">4⭐⭐⭐⭐</div>
+                        <div class="hidden sm:block">ดี</div>
+                    </div>
+                    <div class="bg-green-100 rounded p-1 sm:p-2">
+                        <div class="text-lg sm:text-xl">5⭐⭐⭐⭐⭐</div>
+                        <div class="hidden sm:block">ดีเยี่ยม</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- Voting Form -->
-        <div id="votingForm" class="bg-white rounded-2xl shadow-2xl p-4 sm:p-6">
-            <!-- Name Input -->
-            <div class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b-2 border-gray-200">
-                <label class="block text-base sm:text-lg font-semibold text-gray-700 mb-2">
-                    ชื่อผู้ให้คะแนน *
-                </label>
-                <input
-                    type="text"
-                    id="voterName"
-                    placeholder="กรอกชื่อของคุณ"
-                    class="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-blue-300 rounded-lg focus:outline-none focus:border-blue-500 text-base sm:text-lg"
-                />
-            </div>
+                <div id="votingForm" class="bg-white rounded-2xl shadow-2xl p-4 sm:p-6">
+                        <div class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b-2 border-gray-200">
+                <label class="block text-base sm:text-lg font-semibold text-gray-700 mb-2">
+                    ชื่อผู้ให้คะแนน *
+                </label>
+                <input
+                    type="text"
+                    id="voterName"
+                    placeholder="กรอกชื่อของคุณ"
+                    class="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-blue-300 rounded-lg focus:outline-none focus:border-blue-500 text-base sm:text-lg"
+                />
+            </div>
 
-            <!-- Progress -->
-            <div class="mb-4 sm:mb-6 bg-gray-100 rounded-lg p-3 sm:p-4">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="font-semibold text-gray-700 text-sm sm:text-base">ความคืบหน้า:</span>
-                    <span id="progressText" class="text-blue-600 font-bold text-sm sm:text-base">0/15 คะแนน</span>
-                </div>
-                <div class="w-full bg-gray-300 rounded-full h-2 sm:h-3">
-                    <div id="progressBar" class="bg-gradient-to-r from-blue-600 to-cyan-600 h-2 sm:h-3 rounded-full transition-all" style="width: 0%"></div>
-                </div>
-            </div>
+                        <div class="mb-4 sm:mb-6 bg-gray-100 rounded-lg p-3 sm:p-4">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-semibold text-gray-700 text-sm sm:text-base">ความคืบหน้า:</span>
+                    <span id="progressText" class="text-blue-600 font-bold text-sm sm:text-base">0/15 คะแนน</span>
+                </div>
+                <div class="w-full bg-gray-300 rounded-full h-2 sm:h-3">
+                    <div id="progressBar" class="bg-gradient-to-r from-blue-600 to-cyan-600 h-2 sm:h-3 rounded-full transition-all" style="width: 0%"></div>
+                </div>
+            </div>
 
-            <!-- Scoring Grid -->
-            <div id="scoringGrid"></div>
+                        <div id="scoringGrid"></div>
 
-            <!-- Submit Button -->
-            <button
-                id="submitBtn"
-                class="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-3 sm:py-4 rounded-xl font-bold text-lg sm:text-xl transition-all shadow-lg transform hover:scale-105 hover:from-blue-700 hover:to-cyan-700 mt-4 sm:mt-6"
-            >
-                ส่งคะแนน
-            </button>
-        </div>
+                        <button
+                id="submitBtn"
+                class="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-3 sm:py-4 rounded-xl font-bold text-lg sm:text-xl transition-all shadow-lg transform hover:scale-105 hover:from-blue-700 hover:to-cyan-700 mt-4 sm:mt-6"
+            >
+                ส่งคะแนน
+            </button>
+        </div>
 
-        <!-- Success Message -->
-        <div id="successMessage" class="hidden bg-white rounded-2xl shadow-2xl p-6 sm:p-8">
-            <div class="text-center py-8 sm:py-12">
-                <div class="text-5xl sm:text-6xl mb-4">✅</div>
-                <h2 class="text-2xl sm:text-3xl font-bold text-green-600 mb-2">
-                    ขอบคุณสำหรับการให้คะแนน!
-                </h2>
-                <p class="text-sm sm:text-base text-gray-600 mb-2">คะแนนของคุณถูกบันทึกเรียบร้อยแล้ว</p>
-                <p id="voterNameDisplay" class="text-xs sm:text-sm text-gray-500 mb-6 sm:mb-8"></p>
-                
-                <button
-                    id="voteAgainBtn"
-                    class="px-6 sm:px-8 py-2 sm:py-3 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 transition-all text-sm sm:text-base"
-                >
-                    ให้คะแนนอีกครั้ง
-                </button>
-            </div>
-        </div>
-    </div>
+                <div id="successMessage" class="hidden bg-white rounded-2xl shadow-2xl p-6 sm:p-8">
+            <div class="text-center py-8 sm:py-12">
+                <div class="text-5xl sm:text-6xl mb-4">✅</div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-green-600 mb-2">
+                    ขอบคุณสำหรับการให้คะแนน!
+                </h2>
+                <p class="text-sm sm:text-base text-gray-600 mb-2">คะแนนของคุณถูกบันทึกเรียบร้อยแล้ว</p>
+                <p id="voterNameDisplay" class="text-xs sm:text-sm text-gray-500 mb-6 sm:mb-8"></p>
+                
+                <button
+                    id="voteAgainBtn"
+                    class="px-6 sm:px-8 py-2 sm:py-3 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 transition-all text-sm sm:text-base"
+                >
+                    ให้คะแนนอีกครั้ง
+                </button>
+            </div>
+        </div>
+    </div>
 
-    <script>
-        // Firebase Config
-        const firebaseConfig = {
-            apiKey: "AIzaSyBxQI-sxUkZshLoAq9sZQ5zKm-7NXyytfQ",
-            authDomain: "newyear-party-vote.firebaseapp.com",
-            databaseURL: "https://newyear-party-vote-default-rtdb.asia-southeast1.firebaseio.com",
-            projectId: "newyear-party-vote",
-            storageBucket: "newyear-party-vote.firebasestorage.app",
-            messagingSenderId: "537539574238",
-            appId: "1:537539574238:web:b7ed2507d1bcfc3203854f"
-        };
+    <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBxQI-sxUkZshLoAq9sZQ5zKm-7NXyytfQ",
+            authDomain: "newyear-party-vote.firebaseapp.com",
+            databaseURL: "https://newyear-party-vote-default-rtdb.asia-southeast1.firebaseio.com",
+            projectId: "newyear-party-vote",
+            storageBucket: "newyear-party-vote.firebasestorage.app",
+            messagingSenderId: "537539574238",
+            appId: "1:537539574238:web:b7ed2507d1bcfc3203854f"
+        };
 
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-        // Configuration
-        const CATEGORIES = [
-            { id: 'cat1', name: 'ความสวยงาม ความพร้อมเพรียง' },
-            { id: 'cat2', name: 'ลีลา และความต่อเนื่องในการแสดง' },
-            { id: 'cat3', name: 'ความคิดริเริ่มสร้างสรรค์' }
-        ];
+        // Configuration
+        const CATEGORIES = [
+            { id: 'cat1', name: 'ความสวยงาม ความพร้อมเพรียง' },
+            { id: 'cat2', name: 'ลีลา และความต่อเนื่องในการแสดง' },
+            { id: 'cat3', name: 'ความคิดริเริ่มสร้างสรรค์' }
+        ];
 
-        const TEAMS = [
-            { 
-                id: 't1', 
-                name: 'ลูกหวัง แม่ก็หวัง', 
-                members: ['ที', 'อ้น', 'นัท', 'ปูเป้', 'ข้าวโพด', 'ซัน', 'ส้ม', 'เปรียว', 'เฟิร์น', 'เป้', 'บอล', 'จูน'],
-                color: '#8B5CF6'
-            },
-            { 
-                id: 't2', 
-                name: 'Varinda Distribution Center', 
-                members: ['ตั้ง', 'ไอซ์', 'ดิว', 'วี', 'บังหรัง', 'บอส', 'นิก'],
-                color: '#3B82F6'
-            },
-            { 
-                id: 't3', 
-                name: 'ECOM', 
-                members: ['ทอดมัน', 'ตูน', 'มอส', 'แพรว', 'โซดา', 'ดา'],
-                color: '#10B981'
-            },
-            { 
-                id: 't4', 
-                name: 'ชิงร้อยชิงล้าน', 
-                members: ['สีน้ำ', 'ฝ้าย', 'เอื้อ', 'อิ้ง', 'ติ๊ด', 'แก้ม', 'อิ๋ว', 'บอส', 'หนิง', 'แพรว'],
-                color: '#F59E0B'
-            },
-            { 
-                id: 't5', 
-                name: 'TYP ENTERTAINMENT', 
-                members: ['บิว', 'ลิ้ม', 'ฟิ่ว', 'เต้ย', 'น็อต', 'แซม', 'ไนซ์', 'กัน', 'ตาล', 'เบล', 'พลอย'],
-                color: '#EF4444'
-            }
-        ];
+        const TEAMS = [
+            { 
+                id: 't1', 
+                name: 'ลูกหวัง แม่ก็หวัง', 
+                members: ['ที', 'อ้น', 'นัท', 'ปูเป้', 'ข้าวโพด', 'ซัน', 'ส้ม', 'เปรียว', 'เฟิร์น', 'เป้', 'บอล', 'จูน'],
+                color: '#8B5CF6'
+            },
+            { 
+                id: 't2', 
+                name: 'Varinda Distribution Center', 
+                members: ['ตั้ง', 'ไอซ์', 'ดิว', 'วี', 'บังหรัง', 'บอส', 'นิก'],
+                color: '#3B82F6'
+            },
+            { 
+                id: 't3', 
+                name: 'ECOM', 
+                members: ['ทอดมัน', 'ตูน', 'มอส', 'แพรว', 'โซดา', 'ดา'],
+                color: '#10B981'
+            },
+            { 
+                id: 't4', 
+                name: 'ชิงร้อยชิงล้าน', 
+                members: ['สีน้ำ', 'ฝ้าย', 'เอื้อ', 'อิ้ง', 'ติ๊ด', 'แก้ม', 'อิ๋ว', 'บอส', 'หนิง', 'แพรว'],
+                color: '#F59E0B'
+            },
+            { 
+                id: 't5', 
+                name: 'TYP ENTERTAINMENT', 
+                members: ['บิว', 'ลิ้ม', 'ฟิ่ว', 'เต้ย', 'น็อต', 'แซม', 'ไนซ์', 'กัน', 'ตาล', 'เบล', 'พลอย'],
+                color: '#EF4444'
+            }
+        ];
 
-        let scores = {};
+        let scores = {};
 
-        // Initialize scores
-        TEAMS.forEach(team => {
-            scores[team.id] = {};
-            CATEGORIES.forEach(category => {
-                scores[team.id][category.id] = 0;
-            });
-        });
+        // Initialize scores
+        TEAMS.forEach(team => {
+            scores[team.id] = {};
+            CATEGORIES.forEach(category => {
+                scores[team.id][category.id] = 0;
+            });
+        });
 
-        // Render Scoring Grid
-        function renderScoringGrid() {
-            const container = document.getElementById('scoringGrid');
-            
-            const html = TEAMS.map((team, idx) => `
-                <div class="mb-6 sm:mb-8 pb-6 sm:pb-8 ${idx < TEAMS.length - 1 ? 'border-b-2 border-gray-100' : ''}">
-                    <div class="mb-4 sm:mb-5">
-                        <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-                            <div 
-                                class="w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg flex-shrink-0"
-                                style="background-color: ${team.color}"
-                            >
-                                ${idx + 1}
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <h3 class="text-lg sm:text-2xl font-bold text-gray-800 truncate">${team.name}</h3>
-                                <p class="text-xs sm:text-sm text-gray-500 font-semibold mt-1">
-                                    สมาชิก ${team.members.length} คน
-                                </p>
-                            </div>
-                        </div>
-                        <p class="text-xs sm:text-sm text-gray-600 ml-12 sm:ml-16">
-                            ${team.members.join(', ')}
-                        </p>
-                    </div>
+        // Render Scoring Grid
+        function renderScoringGrid() {
+            const container = document.getElementById('scoringGrid');
+            
+            const html = TEAMS.map((team, idx) => `
+                <div class="mb-6 sm:mb-8 pb-6 sm:pb-8 ${idx < TEAMS.length - 1 ? 'border-b-2 border-gray-100' : ''}">
+                    <div class="mb-4 sm:mb-5">
+                        <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                            <div 
+                                class="w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg flex-shrink-0"
+                                style="background-color: ${team.color}"
+                            >
+                                ${idx + 1}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-lg sm:text-2xl font-bold text-gray-800 truncate">${team.name}</h3>
+                                <p class="text-xs sm:text-sm text-gray-500 font-semibold mt-1">
+                                    สมาชิก ${team.members.length} คน
+                                </p>
+                            </div>
+                        </div>
+                        <p class="text-xs sm:text-sm text-gray-600 ml-12 sm:ml-16">
+                            ${team.members.join(', ')}
+                        </p>
+                    </div>
 
-                    <div class="space-y-3 sm:space-y-4">
-                        ${CATEGORIES.map((category, catIdx) => `
-                            <div class="bg-gray-50 rounded-lg p-3 sm:p-4">
-                                <p class="font-semibold text-gray-700 mb-2 sm:mb-3 text-sm sm:text-base">${catIdx + 1}. ${category.name}</p>
-                                <div class="grid grid-cols-5 gap-1 sm:gap-2">
-                                    ${[1, 2, 3, 4, 5].map(score => `
-                                        <button
-                                            data-team="${team.id}"
-                                            data-category="${category.id}"
-                                            data-score="${score}"
-                                            class="score-btn py-2 sm:py-3 px-1 sm:px-2 rounded-lg border-2 transition-all text-center font-bold
-                                                ${score === 1 ? 'border-red-300 hover:bg-red-100 hover:border-red-500' : ''}
-                                                ${score === 2 ? 'border-orange-300 hover:bg-orange-100 hover:border-orange-500' : ''}
-                                                ${score === 3 ? 'border-yellow-300 hover:bg-yellow-100 hover:border-yellow-500' : ''}
-                                                ${score === 4 ? 'border-lime-300 hover:bg-lime-100 hover:border-lime-500' : ''}
-                                                ${score === 5 ? 'border-green-300 hover:bg-green-100 hover:border-green-500' : ''}
-                                            "
-                                        >
-                                            <div class="text-xl sm:text-2xl mb-0.5 sm:mb-1">${score}</div>
-                                        </button>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('');
+                    <div class="space-y-3 sm:space-y-4">
+                        ${CATEGORIES.map((category, catIdx) => `
+                            <div class="bg-gray-50 rounded-lg p-3 sm:p-4">
+                                <p class="font-semibold text-gray-700 mb-2 sm:mb-3 text-sm sm:text-base">${catIdx + 1}. ${category.name}</p>
+                                <div class="grid grid-cols-5 gap-1 sm:gap-2">
+                                    ${[1, 2, 3, 4, 5].map(score => {
+                                        const isSelected = scores[team.id][category.id] === score;
+                                        
+                                        // Base color classes for hover/unselected state
+                                        let colorClass = '';
+                                        if (score === 1) colorClass = 'border-red-300 hover:bg-red-100 hover:border-red-500';
+                                        if (score === 2) colorClass = 'border-orange-300 hover:bg-orange-100 hover:border-orange-500';
+                                        if (score === 3) colorClass = 'border-yellow-300 hover:bg-yellow-100 hover:border-yellow-500';
+                                        if (score === 4) colorClass = 'border-lime-300 hover:bg-lime-100 hover:border-lime-500';
+                                        if (score === 5) colorClass = 'border-green-300 hover:bg-green-100 hover:border-green-500';
+                                        
+                                        // Active classes
+                                        const activeClass = isSelected ? 'ring-4 ring-blue-500 scale-110 ' + (
+                                            score === 1 ? 'bg-red-100' : 
+                                            score === 2 ? 'bg-orange-100' : 
+                                            score === 3 ? 'bg-yellow-100' : 
+                                            score === 4 ? 'bg-lime-100' : 
+                                            score === 5 ? 'bg-green-100' : ''
+                                        ) : '';
+                                        
+                                        // แสดงแค่ตัวเลข
+                                        return `
+                                            <button
+                                                data-team="${team.id}"
+                                                data-category="${category.id}"
+                                                data-score="${score}"
+                                                class="score-btn flex-1 py-2 sm:py-3 px-1 sm:px-2 rounded-lg border-2 transition-all text-center font-bold text-sm sm:text-lg ${colorClass} ${activeClass}"
+                                            >
+                                                <div class="text-xl sm:text-2xl mb-0.5 sm:mb-1">${score}</div>
+                                            </button>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
 
-            container.innerHTML = html;
+            container.innerHTML = html;
 
-            // Add event listeners
-            document.querySelectorAll('.score-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const teamId = this.dataset.team;
-                    const categoryId = this.dataset.category;
-                    const score = parseInt(this.dataset.score);
-                    selectScore(teamId, categoryId, score, this);
-                });
-            });
-        }
-
-        function selectScore(teamId, categoryId, score, btnElement) {
-            scores[teamId][categoryId] = score;
-
-            // Update UI
-            const buttons = document.querySelectorAll(`[data-team="${teamId}"][data-category="${categoryId}"]`);
-            buttons.forEach(btn => {
-                btn.classList.remove('ring-4', 'ring-blue-500', 'bg-red-100', 'bg-orange-100', 'bg-yellow-100', 'bg-lime-100', 'bg-green-100', 'scale-110');
-                btn.classList.add('border-2');
-            });
-
-            const scoreValue = parseInt(btnElement.dataset.score);
-            btnElement.classList.add('ring-4', 'ring-blue-500', 'scale-110');
-            if (scoreValue === 1) btnElement.classList.add('bg-red-100');
-            if (scoreValue === 2) btnElement.classList.add('bg-orange-100');
-            if (scoreValue === 3) btnElement.classList.add('bg-yellow-100');
-            if (scoreValue === 4) btnElement.classList.add('bg-lime-100');
-            if (scoreValue === 5) btnElement.classList.add('bg-green-100');
-
-            updateProgress();
-        }
-
-        function updateProgress() {
-            let completed = 0;
-            const total = TEAMS.length * CATEGORIES.length;
-
-            TEAMS.forEach(team => {
-                CATEGORIES.forEach(category => {
-                    if (scores[team.id][category.id] > 0) {
-                        completed++;
-                    }
-                });
-            });
-
-            const percentage = (completed / total) * 100;
-            document.getElementById('progressBar').style.width = percentage + '%';
-            document.getElementById('progressText').textContent = `${completed}/${total} คะแนน`;
-        }
-
-        // Submit Vote
-        document.getElementById('submitBtn').addEventListener('click', async function() {
-            const voterName = document.getElementById('voterName').value.trim();
-
-            if (!voterName) {
-                alert('กรุณากรอกชื่อของคุณ');
-                return;
-            }
-
-            // Check if all scores are given
-            let allScored = true;
-            TEAMS.forEach(team => {
-                CATEGORIES.forEach(category => {
-                    if (scores[team.id][category.id] === 0) {
-                        allScored = false;
-                    }
-                });
-            });
-
-            if (!allScored) {
-                alert('กรุณาให้คะแนนให้ครบทุกทีมทุกหัวข้อ');
-                return;
-            }
-
-            this.disabled = true;
-            this.innerHTML = 'กำลังบันทึก...';
-
-            try {
-                const voteData = {
-                    voterName: voterName,
-                    scores: scores,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                };
-
-                await database.ref('performances').push(voteData);
-
-                document.getElementById('votingForm').classList.add('hidden');
-                document.getElementById('successMessage').classList.remove('hidden');
-                document.getElementById('voterNameDisplay').textContent = `ผู้ให้คะแนน: ${voterName}`;
-
-            } catch (error) {
-                alert('เกิดข้อผิดพลาด: ' + error.message);
-                this.disabled = false;
-                this.innerHTML = 'ส่งคะแนน';
-            }
-        });
-
-        // Vote Again
-        document.getElementById('voteAgainBtn').addEventListener('click', function() {
-            // Reset scores
-            TEAMS.forEach(team => {
-                CATEGORIES.forEach(category => {
-                    scores[team.id][category.id] = 0;
-                });
-            });
-
-            document.getElementById('voterName').value = '';
-            document.getElementById('votingForm').classList.remove('hidden');
-            document.getElementById('successMessage').classList.add('hidden');
-            document.getElementById('submitBtn').disabled = false;
-            document.getElementById('submitBtn').innerHTML = 'ส่งคะแนน';
-            
-            renderScoringGrid();
-            updateProgress();
-        });
-
-        // Initialize
-        renderScoringGrid();
-        updateProgress();
-    </script>
+            // Add event listeners
+            document.querySelectorAll('.score-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const teamId = this.dataset.team;
+                    const categoryId = this.dataset.category;
+                    const score = parseInt(this.dataset.score);
+                    selectScore(teamId, categoryId, score, this);
+                });
+            });
+        }
+    </script>
 </body>
 </html>
