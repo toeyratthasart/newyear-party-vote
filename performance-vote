@@ -10,15 +10,14 @@
 </head>
 <body class="bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 min-h-screen p-4">
     <div class="max-w-6xl mx-auto">
-        <!-- Header -->
         <div class="bg-white rounded-2xl shadow-2xl p-6 mb-6 text-center">
             <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-                🎪 การแข่งขันการแสดงปีใหม่ 2025 🎪
+                🎪 Varinda's Performance Awards 2025 🏆
             </h1>
             <p class="text-gray-600 mb-2">ให้คะแนนทั้ง 5 ทีม ใน 3 หัวข้อ (1-5 คะแนน)</p>
             <div class="bg-purple-50 border-2 border-purple-200 rounded-lg p-3 mt-4">
                 <p class="font-semibold text-purple-800 mb-2">เกณฑ์การให้คะแนน:</p>
-                <div class="grid grid-cols-5 gap-2 text-sm text-center">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-2 text-sm text-center">
                     <div class="bg-red-100 rounded p-2">⭐ 1 = น้อยที่สุด</div>
                     <div class="bg-orange-100 rounded p-2">⭐⭐ 2 = น้อย</div>
                     <div class="bg-yellow-100 rounded p-2">⭐⭐⭐ 3 = ปานกลาง</div>
@@ -28,9 +27,7 @@
             </div>
         </div>
 
-        <!-- Voting Form -->
         <div id="votingForm" class="bg-white rounded-2xl shadow-2xl p-6">
-            <!-- Name Input -->
             <div class="mb-6 pb-6 border-b-2 border-gray-200">
                 <label class="block text-lg font-semibold text-gray-700 mb-2">
                     ชื่อผู้ให้คะแนน *
@@ -43,7 +40,6 @@
                 />
             </div>
 
-            <!-- Progress -->
             <div class="mb-6 bg-gray-100 rounded-lg p-4">
                 <div class="flex justify-between items-center mb-2">
                     <span class="font-semibold text-gray-700">ความคืบหน้า:</span>
@@ -54,10 +50,8 @@
                 </div>
             </div>
 
-            <!-- Scoring Grid -->
             <div id="scoringGrid"></div>
 
-            <!-- Submit Button -->
             <button
                 id="submitBtn"
                 class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-bold text-xl transition-all shadow-lg transform hover:scale-105 hover:from-purple-700 hover:to-pink-700 mt-6"
@@ -66,7 +60,6 @@
             </button>
         </div>
 
-        <!-- Success Message -->
         <div id="successMessage" class="hidden bg-white rounded-2xl shadow-2xl p-8">
             <div class="text-center py-12">
                 <div class="text-6xl mb-4">✅</div>
@@ -101,41 +94,41 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Configuration
+        // Configuration (เพิ่มกิมมิก)
         const CATEGORIES = [
-            { id: 'cat1', name: 'ความสวยงาม ความพร้อมเพรียง' },
-            { id: 'cat2', name: 'ลีลา และความต่อเนื่องในการแสดง' },
-            { id: 'cat3', name: 'ความคิดริเริ่มสร้างสรรค์' }
+            { id: 'cat1', name: 'ความเป๊ะปัง! (ความสวยงามและพร้อมเพรียง)' },
+            { id: 'cat2', name: 'อินเนอร์และลีลา (ต่อเนื่องในการแสดง)' },
+            { id: 'cat3', name: 'Wow Factor (ความคิดริเริ่มสร้างสรรค์)' }
         ];
 
         const TEAMS = [
-            { 
+            {  
                 id: 't1', 
-                name: 'ลูกหวัง แม่ก็หวัง', 
+                name: 'The Hopeful VIBES (ลูกหวัง แม่ก็หวัง)', 
                 members: ['ที', 'อ้น', 'นัท', 'ปูเป้', 'ข้าวโพด', 'ซัน', 'ส้ม', 'เปรียว', 'เฟิร์น', 'เป้', 'บอล', 'จูน'],
                 color: '#8B5CF6'
             },
-            { 
+            {  
                 id: 't2', 
-                name: 'Varinda Distribution Center', 
+                name: 'DC Superstars (ศูนย์กระจายความปัง)', 
                 members: ['ตั้ง', 'ไอซ์', 'ดิว', 'วี', 'บังหรัง', 'บอส', 'นิก'],
                 color: '#3B82F6'
             },
-            { 
+            {  
                 id: 't3', 
-                name: 'ECOM', 
+                name: 'E-COMmerce DIVAS (ทีมขายปัง)', 
                 members: ['ทอดมัน', 'ตูน', 'มอส', 'แพรว', 'โซดา', 'ดา'],
                 color: '#10B981'
             },
-            { 
+            {  
                 id: 't4', 
-                name: 'ชิงร้อยชิงล้าน', 
+                name: 'ชิงร้อยชิงล้าน (Varinda Edition)', 
                 members: ['สีน้ำ', 'ฝ้าย', 'เอื้อ', 'อิ้ง', 'ติ๊ด', 'แก้ม', 'อิ๋ว', 'บอส', 'หนิง', 'แพรว'],
                 color: '#F59E0B'
             },
-            { 
+            {  
                 id: 't5', 
-                name: 'TYP ENTERTAINMENT', 
+                name: 'TYP Idol Generation', 
                 members: ['บิว', 'ลิ้ม', 'ฟิ่ว', 'เต้ย', 'น็อต', 'แซม', 'ไนซ์', 'กัน', 'ตาล', 'เบล', 'พลอย'],
                 color: '#EF4444'
             }
@@ -151,7 +144,7 @@
             });
         });
 
-        // Render Scoring Grid
+        // Render Scoring Grid (แก้ไข Responsive และ ดาวล้น)
         function renderScoringGrid() {
             const container = document.getElementById('scoringGrid');
             
@@ -178,26 +171,41 @@
                         ${CATEGORIES.map((category, catIdx) => `
                             <div class="bg-gray-50 rounded-lg p-4">
                                 <p class="font-semibold text-gray-700 mb-3">${catIdx + 1}. ${category.name}</p>
-                                <div class="flex gap-2 justify-between">
-                                    ${[1, 2, 3, 4, 5].map(score => `
-                                        <button
-                                            data-team="${team.id}"
-                                            data-category="${category.id}"
-                                            data-score="${score}"
-                                            class="score-btn flex-1 py-3 px-2 rounded-lg border-2 transition-all text-center font-bold
-                                                ${score === 1 ? 'border-red-300 hover:bg-red-100 hover:border-red-500' : ''}
-                                                ${score === 2 ? 'border-orange-300 hover:bg-orange-100 hover:border-orange-500' : ''}
-                                                ${score === 3 ? 'border-yellow-300 hover:bg-yellow-100 hover:border-yellow-500' : ''}
-                                                ${score === 4 ? 'border-lime-300 hover:bg-lime-100 hover:border-lime-500' : ''}
-                                                ${score === 5 ? 'border-green-300 hover:bg-green-100 hover:border-green-500' : ''}
-                                            "
-                                        >
-                                            <div class="text-2xl mb-1">${score}</div>
-                                            <div class="text-xs text-gray-600">
-                                                ${'⭐'.repeat(score)}
-                                            </div>
-                                        </button>
-                                    `).join('')}
+                                <div id="scoreBtns-${team.id}-${category.id}" class="flex gap-1.5 justify-between">
+                                    ${[1, 2, 3, 4, 5].map(score => {
+                                        const isSelected = scores[team.id][category.id] === score;
+                                        
+                                        // Base color classes for hover/unselected state
+                                        let colorClass = '';
+                                        if (score === 1) colorClass = 'border-red-300 hover:bg-red-100 hover:border-red-500';
+                                        if (score === 2) colorClass = 'border-orange-300 hover:bg-orange-100 hover:border-orange-500';
+                                        if (score === 3) colorClass = 'border-yellow-300 hover:bg-yellow-100 hover:border-yellow-500';
+                                        if (score === 4) colorClass = 'border-lime-300 hover:bg-lime-100 hover:border-lime-500';
+                                        if (score === 5) colorClass = 'border-green-300 hover:bg-green-100 hover:border-green-500';
+                                        
+                                        // Active classes
+                                        const activeClass = isSelected ? 'ring-4 ring-purple-500 scale-[1.05] ' + (
+                                            score === 1 ? 'bg-red-100' : 
+                                            score === 2 ? 'bg-orange-100' : 
+                                            score === 3 ? 'bg-yellow-100' : 
+                                            score === 4 ? 'bg-lime-100' : 
+                                            score === 5 ? 'bg-green-100' : ''
+                                        ) : '';
+                                        
+                                        return `
+                                            <button
+                                                data-team="${team.id}"
+                                                data-category="${category.id}"
+                                                data-score="${score}"
+                                                class="score-btn flex-1 py-3 px-1 rounded-lg border-2 transition-all text-center font-bold text-sm ${colorClass} ${activeClass}"
+                                            >
+                                                <div class="text-xl mb-1">${score}</div> 
+                                                <div class="text-[9px] text-gray-600 leading-none">
+                                                    ${'⭐'.repeat(score)}
+                                                </div>
+                                            </button>
+                                        `;
+                                    }).join('')}
                                 </div>
                             </div>
                         `).join('')}
@@ -221,11 +229,11 @@
         function selectScore(teamId, categoryId, score, btnElement) {
             scores[teamId][categoryId] = score;
 
-            // Update UI
+            // Update UI: Re-render the specific category buttons
             const buttons = document.querySelectorAll(`[data-team="${teamId}"][data-category="${categoryId}"]`);
+            
             buttons.forEach(btn => {
-                btn.classList.remove('ring-4', 'ring-purple-500', 'bg-red-100', 'bg-orange-100', 'bg-yellow-100', 'bg-lime-100', 'bg-green-100', 'scale-110');
-                btn.classList.add('border-2');
+                btn.classList.remove('ring-4', 'ring-purple-500', 'scale-110', 'bg-red-100', 'bg-orange-100', 'bg-yellow-100', 'bg-lime-100', 'bg-green-100');
             });
 
             const scoreValue = parseInt(btnElement.dataset.score);
@@ -254,6 +262,18 @@
             const percentage = (completed / total) * 100;
             document.getElementById('progressBar').style.width = percentage + '%';
             document.getElementById('progressText').textContent = `${completed}/${total} คะแนน`;
+            
+            // Update Submit Button UI
+            const submitBtn = document.getElementById('submitBtn');
+            if (completed === total) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'hover:from-purple-700', 'hover:to-pink-700');
+                submitBtn.classList.add('bg-gradient-to-r', 'from-green-600', 'to-green-700', 'hover:from-green-700', 'hover:to-green-800');
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.classList.remove('bg-gradient-to-r', 'from-green-600', 'to-green-700', 'hover:from-green-700', 'hover:to-green-800');
+                submitBtn.classList.add('bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'hover:from-purple-700', 'hover:to-pink-700');
+            }
         }
 
         // Submit Vote
@@ -290,6 +310,7 @@
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 };
 
+                // บันทึกไปที่ path 'performances'
                 await database.ref('performances').push(voteData);
 
                 document.getElementById('votingForm').classList.add('hidden');
@@ -300,6 +321,7 @@
                 alert('เกิดข้อผิดพลาด: ' + error.message);
                 this.disabled = false;
                 this.innerHTML = '<span>📤</span> ส่งคะแนน';
+                updateProgress(); // Restore button state
             }
         });
 
