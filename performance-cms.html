@@ -76,7 +76,7 @@
             </div>
 
                         <div class="bg-slate-800 rounded-2xl shadow-2xl p-4 sm:p-8 border border-slate-700">
-                <h3 class="text-lg sm:text-2xl font-bold text-white mb-4 sm:mb-6">📋 ตารางคะแนนรายละเอียด</h3>
+                <h3 class="text-lg sm:text-2xl font-bold text-white mb-4 sm:mb-6">📋 ตารางคะแนนละเอียด</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-white text-xs sm:text-base">
                         <thead class="bg-slate-700">
@@ -108,34 +108,60 @@
     </div>
 
     <script>
-        // ... (โค้ด Firebase Config เหมือนเดิม) ...
-        const firebaseConfig = {
-            apiKey: "AIzaSyBxQI-sxUkZshLoAq9sZQ5zKm-7NXyytfQ",
-            authDomain: "newyear-party-vote.firebaseapp.com",
-            databaseURL: "https://newyear-party-vote-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "newyear-party-vote",
-            storageBucket: "newyear-party-vote.firebasestorage.app",
-            messagingSenderId: "537539574238",
-            appId: "1:537539574238:web:b7ed2507d1bcfc3203854f"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        // ... (Firebase Config และ Configuration TEAMS/CATEGORIES เหมือนเดิม) ...
+        const firebaseConfig = {
+  apiKey: "AIzaSyBxQI-sxUkZshLoAq9sZQ5zKm-7NXyytfQ",
+  authDomain: "newyear-party-vote.firebaseapp.com",
+  databaseURL: "https://newyear-party-vote-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "newyear-party-vote",
+  storageBucket: "newyear-party-vote.firebasestorage.app",
+  messagingSenderId: "537539574238",
+  appId: "1:537539574238:web:b7ed2507d1bcfc3203854f"
+};
 
-        // Configuration
-        const CATEGORIES = [
-            { id: 'cat1', name: 'ความสวยงาม ความพร้อมเพรียง', short: 'สวยงาม' },
-            { id: 'cat2', name: 'ลีลา และความต่อเนื่องในการแสดง', short: 'ลีลา' },
-            { id: 'cat3', name: 'ความคิดริเริ่มสร้างสรรค์', short: 'สร้างสรรค์' }
-        ];
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-        const TEAMS = [
-            { id: 't1', name: 'ลูกหวัง แม่ก็หวัง', members: ['ที', 'อ้น', 'นัท', 'ปูเป้', 'ข้าวโพด', 'ซัน', 'ส้ม', 'เปรียว', 'เฟิร์น', 'เป้', 'บอล', 'จูน'], color: '#8B5CF6' },
-            { id: 't2', name: 'Varinda Distribution Center', members: ['ตั้ง', 'ไอซ์', 'ดิว', 'วี', 'บังหรัง', 'บอส', 'นิก'], color: '#3B82F6' },
-            { id: 't3', name: 'ECOM', members: ['ทอดมัน', 'ตูน', 'มอส', 'แพรว', 'โซดา', 'ดา'], color: '#10B981' },
-            { id: 't4', name: 'ชิงร้อยชิงล้าน', members: ['สีน้ำ', 'ฝ้าย', 'เอื้อ', 'อิ้ง', 'ติ๊ด', 'แก้ม', 'อิ๋ว', 'บอส', 'หนิง', 'แพรว'], color: '#F59E0B' },
-            { id: 't5', name: 'TYP ENTERTAINMENT', members: ['บิว', 'ลิ้ม', 'ฟิ่ว', 'เต้ย', 'น็อต', 'แซม', 'ไนซ์', 'กัน', 'ตาล', 'เบล', 'พลอย'], color: '#EF4444' }
-        ];
-        
+        // Configuration
+        const CATEGORIES = [
+            { id: 'cat1', name: 'ความสวยงาม ความพร้อมเพรียง', short: 'สวยงาม' },
+            { id: 'cat2', name: 'ลีลา และความต่อเนื่องในการแสดง', short: 'ลีลา' },
+            { id: 'cat3', name: 'ความคิดริเริ่มสร้างสรรค์', short: 'สร้างสรรค์' }
+        ];
+
+        const TEAMS = [
+            { 
+                id: 't1', 
+                name: 'ลูกหวัง แม่ก็หวัง', 
+                members: ['ที', 'อ้น', 'นัท', 'ปูเป้', 'ข้าวโพด', 'ซัน', 'ส้ม', 'เปรียว', 'เฟิร์น', 'เป้', 'บอล', 'จูน'],
+                color: '#8B5CF6'
+            },
+            { 
+                id: 't2', 
+                name: 'Varinda Distribution Center', 
+                members: ['ตั้ง', 'ไอซ์', 'ดิว', 'วี', 'บังหรัง', 'บอส', 'นิก'],
+                color: '#3B82F6'
+            },
+            { 
+                id: 't3', 
+                name: 'ECOM', 
+                members: ['ทอดมัน', 'ตูน', 'มอส', 'แพรว', 'โซดา', 'ดา'],
+                color: '#10B981'
+            },
+            { 
+                id: 't4', 
+                name: 'ชิงร้อยชิงล้าน', 
+                members: ['สีน้ำ', 'ฝ้าย', 'เอื้อ', 'อิ้ง', 'ติ๊ด', 'แก้ม', 'อิ๋ว', 'บอส', 'หนิง', 'แพรว'],
+                color: '#F59E0B'
+            },
+            { 
+                id: 't5', 
+                name: 'TYP ENTERTAINMENT', 
+                members: ['บิว', 'ลิ้ม', 'ฟิ่ว', 'เต้ย', 'น็อต', 'แซม', 'ไนซ์', 'กัน', 'ตาล', 'เบล', 'พลอย'],
+                color: '#EF4444'
+            }
+        ];
+
         let allScores = [];
         let charts = {};
 
@@ -146,11 +172,8 @@
             updateDashboard();
         });
 
-        // ... (ฟังก์ชัน calculateResults, updateDashboard, updateOverallRanking, updateCategoryScores, updateDetailedTable, updateJudgesList, exportToExcel เหมือนเดิม) ...
-
-        // ฟังก์ชันเดิมที่คุณส่งมาถูกจัดเรียงใหม่แล้ว
+        // ฟังก์ชัน calculateResults()
         function calculateResults() {
-            // ... (โค้ดคำนวณผลลัพธ์เหมือนเดิม) ...
             const results = {};
             
             TEAMS.forEach(team => {
@@ -199,6 +222,7 @@
             return results;
         }
 
+        // ฟังก์ชัน updateDashboard()
         function updateDashboard() {
             const totalJudges = allScores.length;
             document.getElementById('totalJudges').textContent = totalJudges;
@@ -224,6 +248,7 @@
             updateJudgesList();
         }
 
+        // ฟังก์ชัน updateOverallRanking()
         function updateOverallRanking() {
             const results = calculateResults();
             const ranking = Object.values(results)
@@ -258,6 +283,7 @@
             document.getElementById('overallRanking').innerHTML = html;
         }
 
+        // ฟังก์ชัน updateCategoryScores()
         function updateCategoryScores() {
             const results = calculateResults();
             const container = document.getElementById('categoryScores');
@@ -353,6 +379,7 @@
             });
         }
 
+        // ฟังก์ชัน updateDetailedTable()
         function updateDetailedTable() {
             const results = calculateResults();
             const ranking = Object.values(results)
@@ -380,6 +407,7 @@
             document.getElementById('detailedTable').innerHTML = html;
         }
 
+        // ฟังก์ชัน updateJudgesList()
         function updateJudgesList() {
             const html = allScores.map((score) => {
                 const time = score.timestamp ? new Date(score.timestamp).toLocaleTimeString('th-TH', { 
